@@ -1,0 +1,72 @@
+.Login_Page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.Login_Form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 480px;
+    height: 100%;
+    padding: 50px;
+
+    p {
+        font-size: 14px;
+
+        Button {
+            gap: 0;
+
+            .Login_Form_Icon {
+                margin-left: 3px;
+                transition: margin-left 0.3s ease;
+            }
+        }
+
+        Button:hover {
+            .Login_Form_Icon {
+                margin-left: 8px;
+            }
+        }
+    }
+
+    &_Item {
+        width: 100%;
+        margin: 0;
+
+        Input {
+            margin-top: 7px;
+            height: 36px;
+        }
+    }
+
+    &_Commit {
+        margin: 0;
+        width: 100%;
+        height: 36px;
+    }
+
+}
+
+.Login_Image {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #5e5e5e;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .Login_Image {
+        display: none;
+    }
+}
