@@ -1,12 +1,13 @@
 import './index.scss'
 
 interface ActiveBoxProps {
-    children: React.ReactNode
+    children: React.ReactNode;
+    className?: string;
 }
 
-export const ActiveBox = ({ children }: ActiveBoxProps) => {
+export const ActiveBox = ({ children, className = '' }: ActiveBoxProps) => {
     return (
-        <div className='ActiceBox'>
+        <div className={`ActiceBox ${className}`}>
             {children}
         </div>
     )

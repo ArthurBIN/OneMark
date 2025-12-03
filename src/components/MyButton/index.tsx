@@ -1,5 +1,6 @@
 import { CSSProperties } from 'react';
 import { GlowCard } from '@/components/GlowCard';
+import { LoadingOutlined } from '@ant-design/icons';
 import './index.scss';
 
 type ButtonSize = 'small' | 'medium' | 'large';
@@ -16,6 +17,7 @@ interface MyButtonProps {
     textColor?: string;
     glowColor?: string;
     glowSize?: number;
+    loading?: boolean;
 }
 
 export const MyButton = ({
@@ -29,7 +31,8 @@ export const MyButton = ({
     backgroundColor = '#000000',
     textColor = '#ffffff',
     glowColor = '255, 255, 255',
-    glowSize = 150
+    glowSize = 150,
+    loading = false
 }: MyButtonProps) => {
     const handleClick = () => {
         if (!disabled && onClick) {
@@ -52,6 +55,9 @@ export const MyButton = ({
             onClick={handleClick}
         >
             {icon && <span className="my-button__icon">{icon}</span>}
+            {loading && <span className="my-button__icon">
+                <LoadingOutlined />
+            </span>}
             <span className="my-button__text">{children}</span>
         </GlowCard>
     );

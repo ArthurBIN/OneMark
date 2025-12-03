@@ -38,7 +38,7 @@ export const Login = () => {
     try {
       setLoading(true)
       await signInWithPassword(values.email, values.password);
-      navigate('/dashboard')
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '登录失败';
       messageApi.error(`登录失败: ${errorMessage}`);

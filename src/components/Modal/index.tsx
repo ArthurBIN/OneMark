@@ -9,6 +9,7 @@ interface ModalProps {
     titleIcon?: React.ReactNode;
     children: React.ReactNode;
     buttonText?: string;
+    loading?: boolean;
     onButtonClick?: () => void;
     showButton?: boolean;
 }
@@ -20,6 +21,7 @@ export const Modal = ({
     titleIcon,
     children,
     buttonText = '确定',
+    loading = false,
     onButtonClick,
     showButton = true
 }: ModalProps) => {
@@ -86,6 +88,8 @@ export const Modal = ({
                     <div className="modal-footer">
                         <MyButton
                             onClick={handleButtonClick}
+                            disabled={loading}
+                            loading={loading}
                         >
                             {buttonText}
                         </MyButton>

@@ -6,21 +6,48 @@ import addImg from '@/assets/img/add.png'
 import { Modal } from "@/components/Modal";
 import { MyInput } from "@/components/MyInput";
 import { message } from 'antd';
+import { createEmptyResume, getMyResumes } from "@/lib/api/resumes";
+import type { Resume } from "@/types/resumes";
+import { formatRelativeTime } from '@/utils/formatTime';
+import { LoadingOutlined } from '@ant-design/icons';
 
 export const Resumes = () => {
     useEffect(() => {
         document.title = "简历 - 简历积木";
     }, []);
 
+    const [isLoading, setIsLoading] = useState(true);
+
     const [messageApi, contextHolder] = message.useMessage();
 
-    const ContentItems = ["222", "222", "222", "222", "222", "222", "222"];
+    const [myResumes, setMyResumes] = useState<Resume[]>([]);
 
     const [isAddModal, setIsAddModal] = useState(false);
+
+    const [addLoading, setAddLoading] = useState(false);
 
     const [titleText, setTitleText] = useState('');
 
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const fetchMyResumes = async () => {
+        try {
+            setIsLoading(true);
+            const res = await getMyResumes();
+            setMyResumes(res as Resume[]);
+        } catch (error) {
+            messageApi.open({
+                type: 'error',
+                content: `获取简历失败: ${error}`,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchMyResumes();
+    }, []);
 
     useEffect(() => {
         if (isAddModal) {
@@ -30,6 +57,35 @@ export const Resumes = () => {
         }
     }, [isAddModal]);
 
+    const handleCreateResume = async () => {
+        if (!titleText.trim()) {
+            messageApi.open({
+                type: 'error',
+                content: '请输入标题！',
+            });
+            inputRef.current?.focus();
+            return;
+        }
+        try {
+            setAddLoading(true);
+            await createEmptyResume(titleText);
+            messageApi.open({
+                type: 'success',
+                content: '创建成功！',
+            });
+            fetchMyResumes();
+            setAddLoading(false);
+            setTitleText('');
+            setIsAddModal(false);
+        } catch (error) {
+            setAddLoading(false);
+            messageApi.open({
+                type: 'error',
+                content: `创建简历失败: ${error}`,
+            });
+        }
+    }
+
     return (
         <div className="Resumes">
             {contextHolder}
@@ -37,31 +93,42 @@ export const Resumes = () => {
                 <h1>简历</h1>
             </ActiveBox>
 
-            <div className="ContentBox">
-                <GlowCard
-                    className="ContentBoxItem ContentBoxItem1"
-                    onClick={() => {
-                        setIsAddModal(true);
-                        inputRef.current?.focus();
-                    }}
-                >
-                    <img src={addImg} alt="" />
-                    <div className="ContentBoxItem1_text">
-                        <p>新建简历</p>
-                        <p>像搭积木一样搭建自己的简历</p>
-                    </div>
-                </GlowCard>
-
-                {ContentItems.map((item, index) => (
+            {isLoading ? (
+                <ActiveBox className="ContentBoxLoading">
+                    <LoadingOutlined />
+                </ActiveBox>) : (
+                <div className="ContentBox">
                     <GlowCard
-                        key={index}
-                        className="ContentBoxItem"
-                        style={{ animationDelay: `${(index + 1) * 0.1}s` }}
+                        className="ContentBoxItem ContentBoxItem1"
+                        onClick={() => {
+                            setIsAddModal(true);
+                            inputRef.current?.focus();
+                        }}
                     >
-                        {item}
+                        <img src={addImg} alt="" />
+                        <div className="ContentBoxItem1_text">
+                            <p>新建简历</p>
+                            <p>像搭积木一样搭建自己的简历</p>
+                        </div>
                     </GlowCard>
-                ))}
-            </div>
+
+                    {myResumes.map((item, index) => (
+                        <GlowCard
+                            key={item.id}
+                            className="ContentBoxItem"
+                            style={{ animationDelay: `${(index + 1) * 0.1}s` }}
+                        >
+                            <div className="ContentBoxItem1_text">
+                                <p className="title">{item.title}</p>
+                                <p className="time">
+                                    最后更新：{formatRelativeTime(item.updated_at)}
+                                </p>
+                            </div>
+                        </GlowCard>
+                    ))}
+                </div>
+            )}
+
 
             <Modal
                 isOpen={isAddModal}
@@ -69,18 +136,8 @@ export const Resumes = () => {
                 title="新建简历"
                 titleIcon={<span>+</span>}
                 buttonText="新建"
-                onButtonClick={() => {
-                    if (!titleText.trim()) {
-                        messageApi.open({
-                            type: 'error',
-                            content: '请输入标题！',
-                        });
-                        inputRef.current?.focus();
-                        return;
-                    }
-                    setIsAddModal(false);
-                    setTitleText('');
-                }}
+                loading={addLoading}
+                onButtonClick={handleCreateResume}
             >
                 <p>标题</p>
                 <MyInput
