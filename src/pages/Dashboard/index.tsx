@@ -13,16 +13,16 @@ export const Dashboard = () => {
     return (
         <div className="Dashbord">
             <aside>
-                <div className="Logo">简历积木</div>
+                <div className="Logo">一标</div>
                 <div className="divide"></div>
                 <div className="btnBox">
                     <GlowCard
-                        onClick={() => navigate('/dashboard/resumes')}
-                        isShow={location.pathname !== '/dashboard/resumes'}
-                        className={`btnItem ${location.pathname === '/dashboard/resumes' ? 'activeBtnItem' : 'noactiveBtnItem'}`}
+                        onClick={() => navigate('/dashboard/annotations')}
+                        isShow={location.pathname !== '/dashboard/annotations'}
+                        className={`btnItem ${location.pathname === '/dashboard/annotations' ? 'activeBtnItem' : 'noactiveBtnItem'}`}
                     >
                         <FileTextOutlined />
-                        <span>简历</span>
+                        <span>项目</span>
                     </GlowCard>
                     <GlowCard
                         onClick={() => navigate('/dashboard/settings')}

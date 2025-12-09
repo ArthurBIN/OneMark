@@ -1,16 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// 页面组件（待创建）
+// 页面组件（旧项目组件保持不动）
 import { LandingPage } from '@/pages/LandingPage';
 import { Login } from '@/pages/Login';
 import { Register } from '@/pages/Register';
 import { Dashboard } from '@/pages/Dashboard';
-import { Editor } from '@/pages/Editor';
+import { Editor } from '@/pages/Editor/[id]';
 import { Preview } from '@/pages/Preview';
 import { Settings } from '@/pages/Settings';
-import { Resumes } from '@/pages/Resumes';
-
+import { Annotations } from '@/pages/Annotations';
 
 function App() {
   return (
@@ -24,18 +23,17 @@ function App() {
         {/* 受保护的路由 */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />}>
-            {/* 子路由 */}
-            <Route index element={<Navigate to="resumes" replace />} />
-
-            <Route path="resumes" element={<Resumes />} />
+            <Route index element={<Navigate to="annotations" replace />} />
+            <Route path="annotations" element={<Annotations />} />
             <Route path="settings" element={<Settings />} />
           </Route>
+
           <Route path="/editor/:id" element={<Editor />} />
           <Route path="/preview/:id" element={<Preview />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
 
-        {/* 404重定向 */}
+        {/* 404 重定向 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

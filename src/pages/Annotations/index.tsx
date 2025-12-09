@@ -6,49 +6,58 @@ import addImg from '@/assets/img/add.png'
 import { Modal } from "@/components/Modal";
 import { MyInput } from "@/components/MyInput";
 import { message } from 'antd';
-import { createEmptyResume, getMyResumes } from "@/lib/api/resumes";
-import type { Resume } from "@/types/resumes";
+import { createAnnotation, deleteAnnotation, getMyAnnotations } from "@/lib/api/annotation";
+import type { Annotation } from "@/types/annotations";
 import { formatRelativeTime } from '@/utils/formatTime';
 import { LoadingOutlined, FolderOpenOutlined, DeleteOutlined } from '@ant-design/icons';
 import { MyButton } from "@/components/MyButton";
+import { useNavigate } from "react-router-dom";
 
-export const Resumes = () => {
+export const Annotations = () => {
     useEffect(() => {
-        document.title = "简历 - 简历积木";
+        document.title = "项目 - 一标";
     }, []);
 
-    // 加载简历内容
+    const navigate = useNavigate();
+
+    // 加载项目内容
     const [isLoading, setIsLoading] = useState(true);
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    // 简历内容
-    const [myResumes, setMyResumes] = useState<Resume[]>([]);
+    // 项目列表
+    const [myAnnotation, setMyAnnotation] = useState<Annotation[]>([]);
 
-    // 控制新建简历弹窗显示
+    // 控制新建项目弹窗显示
     const [isAddModal, setIsAddModal] = useState(false);
 
-    // 新增简历按钮loading
+    // 新增项目按钮loading
     const [addLoading, setAddLoading] = useState(false);
 
-    // 新增简历标题
+    // 删除项目按钮loading
+    const [delLoading, setDelLoading] = useState(false);
+
+    // 新增项目标题
     const [titleText, setTitleText] = useState('');
 
-    // 控制删除简历弹窗显示
+    // 控制删除项目弹窗显示
     const [isDelModal, setIsDelModal] = useState(false)
+
+    // 删除项目id
+    const [delAnnotationId, setDelAnnotationId] = useState('');
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // 获取简历
-    const fetchMyResumes = async () => {
+    // 获取项目
+    const fetchMyAnnotation = async () => {
         try {
             setIsLoading(true);
-            const res = await getMyResumes();
-            setMyResumes(res as Resume[]);
+            const res = await getMyAnnotations();
+            setMyAnnotation(res as Annotation[]);
         } catch (error) {
             messageApi.open({
                 type: 'error',
-                content: `获取简历失败: ${error}`,
+                content: `获取项目失败: ${error}`,
             });
         } finally {
             setIsLoading(false);
@@ -56,7 +65,7 @@ export const Resumes = () => {
     }
 
     useEffect(() => {
-        fetchMyResumes();
+        fetchMyAnnotation();
     }, []);
 
     useEffect(() => {
@@ -67,8 +76,8 @@ export const Resumes = () => {
         }
     }, [isAddModal]);
 
-    // 新建简历
-    const handleCreateResume = async () => {
+    // 新建项目
+    const handleCreateAnnotation = async () => {
         if (!titleText.trim()) {
             messageApi.open({
                 type: 'error',
@@ -79,12 +88,12 @@ export const Resumes = () => {
         }
         try {
             setAddLoading(true);
-            await createEmptyResume(titleText);
+            await createAnnotation(titleText);
             messageApi.open({
                 type: 'success',
                 content: '创建成功！',
             });
-            fetchMyResumes();
+            fetchMyAnnotation();
             setAddLoading(false);
             setTitleText('');
             setIsAddModal(false);
@@ -92,21 +101,38 @@ export const Resumes = () => {
             setAddLoading(false);
             messageApi.open({
                 type: 'error',
-                content: `创建简历失败: ${error}`,
+                content: `创建项目失败: ${error}`,
             });
         }
     }
 
-    const handleDelResume = () => {
-        console.log(1);
-
+    // 删除项目
+    const handleDelAnnotation = async () => {
+        try {
+            setDelLoading(true);
+            await deleteAnnotation(delAnnotationId);
+            messageApi.open({
+                type: 'success',
+                content: `删除项目成功！`,
+            });
+            setMyAnnotation(prev => prev.filter(r => r.id !== delAnnotationId));
+        } catch (error) {
+            messageApi.open({
+                type: 'error',
+                content: `删除项目失败: ${error}`,
+            });
+        } finally {
+            setDelLoading(false);
+            setDelAnnotationId('');
+            setIsDelModal(false);
+        }
     }
 
     return (
-        <div className="Resumes">
+        <div className="Annotation">
             {contextHolder}
             <ActiveBox>
-                <h1>简历</h1>
+                <h1>项目</h1>
             </ActiveBox>
 
             {isLoading ? (
@@ -123,12 +149,12 @@ export const Resumes = () => {
                     >
                         <img src={addImg} alt="" />
                         <div className="ContentBoxItem1_text">
-                            <p>新建简历</p>
-                            <p>像搭积木一样搭建自己的简历</p>
+                            <p>新建项目</p>
+                            <p>像搭积木一样搭建自己的项目</p>
                         </div>
                     </GlowCard>
 
-                    {myResumes.map((item, index) => (
+                    {myAnnotation.map((item, index) => (
                         <GlowCard
                             key={item.id}
                             className="ContentBoxItem"
@@ -143,14 +169,21 @@ export const Resumes = () => {
                             <div className="ContentBoxItem_Modify">
                                 <MyButton
                                     size="small"
-                                    onClick={() => { }}
+                                    onClick={() => {
+                                        navigate(`/editor/${item.id}`, {
+                                            state: { title: item.title }
+                                        })
+                                    }}
                                     icon={<FolderOpenOutlined />}
                                 >
                                     打开
                                 </MyButton>
                                 <MyButton
                                     size="small"
-                                    onClick={() => setIsDelModal(true)}
+                                    onClick={() => {
+                                        setIsDelModal(true);
+                                        setDelAnnotationId(item.id)
+                                    }}
                                     icon={<DeleteOutlined />}
                                     backgroundColor="#F42F5C"
                                 >
@@ -165,26 +198,26 @@ export const Resumes = () => {
 
             <Modal
                 isOpen={isDelModal}
-                onClose={() => { setIsDelModal(false) }}
-                title="删除简历"
+                onClose={() => { setIsDelModal(false); setDelAnnotationId('') }}
+                title="删除项目"
                 titleIcon={<DeleteOutlined />}
                 buttonText="删除"
-                loading={addLoading}
+                loading={delLoading}
                 buttonColor="#F42F5C"
-                onButtonClick={handleDelResume}
+                onButtonClick={handleDelAnnotation}
             >
-                确认删除此简历？
+                确认删除此项目？
             </Modal>
 
-            {/* 新增简历弹窗 */}
+            {/* 新增项目弹窗 */}
             <Modal
                 isOpen={isAddModal}
                 onClose={() => { setIsAddModal(false); setTitleText('') }}
-                title="新建简历"
+                title="新建项目"
                 titleIcon={<span>+</span>}
                 buttonText="新建"
                 loading={addLoading}
-                onButtonClick={handleCreateResume}
+                onButtonClick={handleCreateAnnotation}
             >
                 <p>标题</p>
                 <MyInput
