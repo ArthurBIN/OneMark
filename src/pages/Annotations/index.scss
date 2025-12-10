@@ -76,15 +76,28 @@
             }
 
             &_text {
+                width: 100%;
                 font-size: 14px;
                 margin-top: 30px;
                 position: absolute;
-                bottom: 1rem;
-                left: 1rem;
+                bottom: 0;
+                left: 0;
+                padding: 0 1rem 1rem 1rem;
 
                 p:nth-child(2) {
                     font-size: 12px;
                     margin-top: 3px;
+                    position: relative;
+
+                    .AnnotationTypeTag {
+                        position: absolute;
+                        right: 0;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        width: 7px;
+                        height: 7px;
+                        border-radius: 3.5px;
+                    }
                 }
             }
         }

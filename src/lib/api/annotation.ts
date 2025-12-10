@@ -2,8 +2,10 @@
 import { supabase } from '@/utils/supabaseClient';
 import type { Annotation } from '@/types/annotations';
 
+type AnnotationType = 'text' | 'file' | 'img';
+
 // 创建空白标注项目
-export async function createAnnotation(title: string = '新的标注项目') {
+export async function createAnnotation(title: string = '新的标注项目', type: AnnotationType) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('未登录');
 
@@ -12,6 +14,7 @@ export async function createAnnotation(title: string = '新的标注项目') {
         .insert({
             user_id: user.id,
             title,
+            type
         })
         .select()
         .single();
@@ -28,7 +31,7 @@ export async function getMyAnnotations() {
 
     const { data, error } = await supabase
         .from('annotations')
-        .select('id, title, slug, is_public, thumbnail, created_at, updated_at')
+        .select()
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 

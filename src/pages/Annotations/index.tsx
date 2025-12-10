@@ -5,13 +5,16 @@ import './index.scss'
 import addImg from '@/assets/img/add.png'
 import { Modal } from "@/components/Modal";
 import { MyInput } from "@/components/MyInput";
-import { message } from 'antd';
+import { message, Radio, ConfigProvider } from 'antd';
+import type { RadioChangeEvent } from 'antd'
 import { createAnnotation, deleteAnnotation, getMyAnnotations } from "@/lib/api/annotation";
 import type { Annotation } from "@/types/annotations";
 import { formatRelativeTime } from '@/utils/formatTime';
 import { LoadingOutlined, FolderOpenOutlined, DeleteOutlined } from '@ant-design/icons';
 import { MyButton } from "@/components/MyButton";
 import { useNavigate } from "react-router-dom";
+
+type AnnotationType = 'text' | 'file' | 'img';
 
 export const Annotations = () => {
     useEffect(() => {
@@ -47,6 +50,10 @@ export const Annotations = () => {
     const [delAnnotationId, setDelAnnotationId] = useState('');
 
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // 项目类型
+    const [annotationType, setAnnotationType] = useState<AnnotationType>('text');
+
 
     // 获取项目
     const fetchMyAnnotation = async () => {
@@ -88,7 +95,7 @@ export const Annotations = () => {
         }
         try {
             setAddLoading(true);
-            await createAnnotation(titleText);
+            await createAnnotation(titleText, annotationType);
             messageApi.open({
                 type: 'success',
                 content: '创建成功！',
@@ -96,6 +103,7 @@ export const Annotations = () => {
             fetchMyAnnotation();
             setAddLoading(false);
             setTitleText('');
+            setAnnotationType('text');
             setIsAddModal(false);
         } catch (error) {
             setAddLoading(false);
@@ -128,6 +136,11 @@ export const Annotations = () => {
         }
     }
 
+
+    const onChange = (e: RadioChangeEvent) => {
+        setAnnotationType(e.target.value);
+    };
+
     return (
         <div className="Annotation">
             {contextHolder}
@@ -150,7 +163,7 @@ export const Annotations = () => {
                         <img src={addImg} alt="" />
                         <div className="ContentBoxItem1_text">
                             <p>新建项目</p>
-                            <p>像搭积木一样搭建自己的项目</p>
+                            <p>开始随心所欲的标记</p>
                         </div>
                     </GlowCard>
 
@@ -161,9 +174,15 @@ export const Annotations = () => {
                             style={{ animationDelay: `${(index + 1) * 0.1}s` }}
                         >
                             <div className="ContentBoxItem1_text">
-                                <p className="title">{item.title}</p>
-                                <p className="time">
+                                <p>{item.title}</p>
+                                <p>
                                     最后更新：{formatRelativeTime(item.updated_at)}
+                                    <div
+                                        className="AnnotationTypeTag"
+                                        style={{
+                                            backgroundColor: item.type === 'text' ? '#108ee9' : (item.type === 'file' ? '#87d068' : '#2db7f5')
+                                        }}
+                                    ></div>
                                 </p>
                             </div>
                             <div className="ContentBoxItem_Modify">
@@ -212,7 +231,11 @@ export const Annotations = () => {
             {/* 新增项目弹窗 */}
             <Modal
                 isOpen={isAddModal}
-                onClose={() => { setIsAddModal(false); setTitleText('') }}
+                onClose={() => {
+                    setIsAddModal(false);
+                    setTitleText('');
+                    setAnnotationType('text');
+                }}
                 title="新建项目"
                 titleIcon={<span>+</span>}
                 buttonText="新建"
@@ -226,6 +249,27 @@ export const Annotations = () => {
                     className="titleInput"
                     onChange={(e) => setTitleText(e.target.value)}
                 />
+                <p style={{ marginTop: '10px' }}>类型</p>
+                <ConfigProvider
+                    theme={{
+                        components: {
+                            Radio: {
+                                colorPrimary: '#000000',
+                            },
+                        },
+                    }}
+                >
+                    <Radio.Group
+                        onChange={onChange}
+                        value={annotationType}
+                        style={{ marginTop: '10px' }}
+                        options={[
+                            { value: 'text', label: '文本' },
+                            { value: 'file', label: '文件' },
+                            { value: 'img', label: '图片' },
+                        ]}
+                    />
+                </ConfigProvider>
             </Modal>
         </div>
     )
