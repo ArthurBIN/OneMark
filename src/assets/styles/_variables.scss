@@ -3,3 +3,43 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+:root {
+    --border-gray: #E1E3E1;
+}
+
+@font-face {
+    font-family: "阿里妈妈东方大楷 Regular";
+    font-weight: 400;
+    src: url("//at.alicdn.com/wf/webfont/H1MJOG2bkpeb/kIb9TdHzjKTL.woff2") format("woff2"),
+        url("//at.alicdn.com/wf/webfont/H1MJOG2bkpeb/pwWBZqlw322T.woff") format("woff");
+    font-variation-settings: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "iconfont";
+    /* Project id 5089481 */
+    src: url('//at.alicdn.com/t/c/font_5089481_pvqave2cgqn.woff2?t=1765807191502') format('woff2'),
+        url('//at.alicdn.com/t/c/font_5089481_pvqave2cgqn.woff?t=1765807191502') format('woff'),
+        url('//at.alicdn.com/t/c/font_5089481_pvqave2cgqn.ttf?t=1765807191502') format('truetype');
+}
+
+.iconfont {
+    font-family: "iconfont" !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-sidebarcebianlan:before {
+    content: "\e6e4";
+}
+
+.icon-fenxiang:before {
+    content: "\e612";
+}
+
+.icon-geren:before {
+    content: "\e608";
+}

@@ -29,6 +29,10 @@ export type AnnotationPage = {
     updated_at: string;
 };
 
+export type AnnotationDetail = Annotation & {
+    pages: AnnotationPage[];
+};
+
 export type TextAnnotation = {
     id: string;
     page_id: string;

@@ -1,0 +1,44 @@
+.AnnotationHeader {
+    width: 100%;
+    height: 45px;
+    border-bottom: 1px solid var(--border-gray);
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+    box-sizing: border-box;
+    position: relative;
+
+    .logo {
+        font-family: "阿里妈妈东方大楷 Regular";
+        font-variation-settings: normal;
+    }
+
+    .title {
+        margin-left: 20px;
+    }
+
+    .buttonBox {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 12px;
+        display: flex;
+        gap: .5rem;
+
+        .buttonItem {
+            width: 32px;
+            height: 32px;
+            text-align: center;
+            line-height: 32px;
+            border-radius: 16px;
+            border: 1px solid var(--border-gray);
+            color: #1E1E1E;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .buttonItem:hover {
+            border-color: #ADADAD;
+        }
+    }
+}

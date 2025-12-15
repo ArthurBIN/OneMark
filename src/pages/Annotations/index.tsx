@@ -5,14 +5,16 @@ import './index.scss'
 import addImg from '@/assets/img/add.png'
 import { Modal } from "@/components/Modal";
 import { MyInput } from "@/components/MyInput";
-import { message, Radio, ConfigProvider } from 'antd';
+import { message, Radio, ConfigProvider, Switch } from 'antd';
 import type { RadioChangeEvent } from 'antd'
-import { createAnnotation, deleteAnnotation, getMyAnnotations } from "@/lib/api/annotation";
+import { createTextAnnotationWithPage, deleteAnnotation, getMyAnnotations } from "@/lib/api/annotation";
 import type { Annotation } from "@/types/annotations";
 import { formatRelativeTime } from '@/utils/formatTime';
 import { LoadingOutlined, FolderOpenOutlined, DeleteOutlined } from '@ant-design/icons';
 import { MyButton } from "@/components/MyButton";
 import { useNavigate } from "react-router-dom";
+import SimpleTextEditor from "@/components/SimpleTextEditor";
+import { memo } from 'react';
 
 type AnnotationType = 'text' | 'file' | 'img';
 
@@ -54,6 +56,14 @@ export const Annotations = () => {
     // 项目类型
     const [annotationType, setAnnotationType] = useState<AnnotationType>('text');
 
+    // 项目是否公开
+    const [isPublic, setIsPublic] = useState(true);
+
+    // 新建文本项目modal
+    const [addTextModal, setAddTextModal] = useState(false);
+
+    // 文本项目内容
+    const [textContent, setTextContent] = useState('')
 
     // 获取项目
     const fetchMyAnnotation = async () => {
@@ -84,33 +94,44 @@ export const Annotations = () => {
     }, [isAddModal]);
 
     // 新建项目
-    const handleCreateAnnotation = async () => {
-        if (!titleText.trim()) {
+    const handleCreateTextAnnotation = async () => {
+        if (textContent === null || textContent === '') {
             messageApi.open({
-                type: 'error',
-                content: '请输入标题！',
+                type: 'warning',
+                content: `文本内容不能为空`,
             });
-            inputRef.current?.focus();
             return;
         }
+
         try {
             setAddLoading(true);
-            await createAnnotation(titleText, annotationType);
+
+            const params = {
+                title: titleText,
+                is_public: isPublic,
+                text_content: textContent,
+                thumbnail: textContent
+            }
+
+            await createTextAnnotationWithPage(params);
+
             messageApi.open({
                 type: 'success',
-                content: '创建成功！',
+                content: '创建成功!',
             });
-            fetchMyAnnotation();
-            setAddLoading(false);
+
             setTitleText('');
+            setTextContent('');
             setAnnotationType('text');
-            setIsAddModal(false);
+            setAddTextModal(false);
+            fetchMyAnnotation();
         } catch (error) {
-            setAddLoading(false);
             messageApi.open({
                 type: 'error',
                 content: `创建项目失败: ${error}`,
             });
+        } finally {
+            setAddLoading(false);
         }
     }
 
@@ -168,53 +189,24 @@ export const Annotations = () => {
                     </GlowCard>
 
                     {myAnnotation.map((item, index) => (
-                        <GlowCard
+                        <AnnotationItem
                             key={item.id}
-                            className="ContentBoxItem"
-                            style={{ animationDelay: `${(index + 1) * 0.1}s` }}
-                        >
-                            <div className="ContentBoxItem1_text">
-                                <p>{item.title}</p>
-                                <p>
-                                    最后更新：{formatRelativeTime(item.updated_at)}
-                                    <div
-                                        className="AnnotationTypeTag"
-                                        style={{
-                                            backgroundColor: item.type === 'text' ? '#108ee9' : (item.type === 'file' ? '#87d068' : '#2db7f5')
-                                        }}
-                                    ></div>
-                                </p>
-                            </div>
-                            <div className="ContentBoxItem_Modify">
-                                <MyButton
-                                    size="small"
-                                    onClick={() => {
-                                        navigate(`/editor/${item.id}`, {
-                                            state: { title: item.title }
-                                        })
-                                    }}
-                                    icon={<FolderOpenOutlined />}
-                                >
-                                    打开
-                                </MyButton>
-                                <MyButton
-                                    size="small"
-                                    onClick={() => {
-                                        setIsDelModal(true);
-                                        setDelAnnotationId(item.id)
-                                    }}
-                                    icon={<DeleteOutlined />}
-                                    backgroundColor="#F42F5C"
-                                >
-                                    删除
-                                </MyButton>
-                            </div>
-                        </GlowCard>
+                            item={item}
+                            index={index}
+                            onClick={() => {
+                                navigate(`/editor/${item.id}`);
+                            }}
+                            onDelete={() => {
+                                setIsDelModal(true);
+                                setDelAnnotationId(item.id);
+                            }}
+                        />
                     ))}
                 </div>
             )}
 
 
+            {/* 删除项目 */}
             <Modal
                 isOpen={isDelModal}
                 onClose={() => { setIsDelModal(false); setDelAnnotationId('') }}
@@ -233,14 +225,25 @@ export const Annotations = () => {
                 isOpen={isAddModal}
                 onClose={() => {
                     setIsAddModal(false);
-                    setTitleText('');
-                    setAnnotationType('text');
+                    // setTitleText('');
+                    // setAnnotationType('text');
                 }}
                 title="新建项目"
                 titleIcon={<span>+</span>}
-                buttonText="新建"
-                loading={addLoading}
-                onButtonClick={handleCreateAnnotation}
+                buttonText="下一步"
+                onButtonClick={() => {
+                    if (titleText === '') {
+                        messageApi.open({
+                            type: 'warning',
+                            content: `标题不能为空`,
+                        });
+                        return;
+                    }
+                    setIsAddModal(false);
+                    if (annotationType === 'text') {
+                        setAddTextModal(true);
+                    }
+                }}
             >
                 <p>标题</p>
                 <MyInput
@@ -270,7 +273,83 @@ export const Annotations = () => {
                         ]}
                     />
                 </ConfigProvider>
+                <p style={{ marginTop: '30px' }}>隐私</p>
+                <ConfigProvider
+                    theme={{
+                        components: {
+                            Switch: {
+                                colorPrimary: '#000000',
+                                colorPrimaryHover: '#333333',
+                                colorTextQuaternary: '#d9d9d9',
+                            },
+                        },
+                    }}
+                >
+                    <Switch
+                        checked={isPublic}
+                        onChange={setIsPublic}
+                        checkedChildren="公开"
+                        unCheckedChildren="私密"
+                        defaultChecked
+                        style={{ marginTop: '10px' }}
+                    />
+                </ConfigProvider>
+            </Modal>
+
+            {/* 新增文本弹窗 */}
+            <Modal
+                isOpen={addTextModal}
+                onClose={() => {
+                    setTitleText('');
+                    setAnnotationType('text');
+                    setAddTextModal(false);
+                }}
+                title="上传文本内容"
+                buttonText="新建"
+                loading={addLoading}
+                onButtonClick={handleCreateTextAnnotation}
+            >
+                <SimpleTextEditor value={textContent} onChange={setTextContent} />
             </Modal>
         </div>
     )
 }
+
+const AnnotationItem = ({ item, index, onDelete, onClick }: any) => {
+
+    return (
+        <GlowCard
+            className="ContentBoxItem"
+            onClick={onClick}
+            style={{ animationDelay: `${(index + 1) * 0.1}s` }}
+        >
+            <div
+                className="ContentBoxItem_Content"
+                dangerouslySetInnerHTML={{ __html: item.thumbnail || '暂无内容' }}
+            />
+            <div className="ContentBoxItem_text">
+                <div className="ContentBoxItem_text_title">
+                    {item.title}
+                    <div
+                        className="ContentBoxItem_Modify_DelButton"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete();
+                        }}
+                    >
+                        <i><DeleteOutlined /></i>
+                    </div>
+                </div>
+                <div className="ContentBoxItem_text_time">
+                    最后更新:{formatRelativeTime(item.updated_at)}
+                    <div
+                        className="AnnotationTypeTag"
+                        style={{
+                            backgroundColor: item.type === 'text' ? '#108ee9' : (item.type === 'file' ? '#87d068' : '#2db7f5')
+                        }}
+                    ></div>
+                </div>
+            </div>
+        </GlowCard>
+    );
+};

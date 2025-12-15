@@ -21,31 +21,138 @@
             background: #F3F4F6;
             border: 1px solid #e0e0e0;
             border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
             opacity: 0;
             animation: box_active 0.3s ease forwards;
-            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-            &_Modify {
-                position: absolute;
-                top: 0;
-                right: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-direction: column;
-                gap: 10px;
-                opacity: 0;
-                z-index: 99;
-                transition: all 0.3s ease;
+            &_Content {
+                border-radius: 4px;
+                flex: 1;
+                background-color: #ffffff;
+                font-size: 12px;
+                line-height: 1.5;
+                overflow-y: auto;
+                word-break: break-word;
+                padding: 8px;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                text-overflow: ellipsis;
+
+                // 默认隐藏滚动条
+                &::-webkit-scrollbar {
+                    width: 4px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: transparent; // 默认透明
+                    border-radius: 2px;
+                }
+
+                // hover 时显示
+                &:hover::-webkit-scrollbar-thumb {
+                    background: rgba(0, 0, 0, 0.2);
+                }
+
+                &:hover::-webkit-scrollbar-thumb:hover {
+                    background: rgba(0, 0, 0, 0.4);
+                }
             }
 
-            &_Modify:hover {
+            &_Content * {
+                font-size: inherit !important;
+                max-width: 100%;
+            }
+
+            &_Content h1,
+            &_Content h2,
+            &_Content h3 {
+                font-size: 13px !important;
+                margin: 2px 0 !important;
+                font-weight: 600;
+            }
+
+            &_Content p {
+                margin: 2px 0 !important;
+                line-height: 1.4;
+            }
+
+            &_Content ul,
+            &_Content ol {
+                padding-left: 16px !important;
+                margin: 2px 0 !important;
+            }
+
+            &_Content li {
+                margin: 1px 0 !important;
+                font-size: 12px !important;
+            }
+
+            &_text {
+                width: 100%;
+                margin-top: 1rem;
+
+                &_title {
+                    font-size: 14px;
+                    position: relative;
+
+                    .ContentBoxItem_Modify_DelButton {
+                        width: 17px;
+                        height: 17px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 2px;
+                        position: absolute;
+                        right: 0;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: red;
+                        font-size: 11px;
+                        transition: background-color 0.3s ease;
+                        opacity: 0;
+                    }
+
+                    .ContentBoxItem_Modify_DelButton:hover {
+                        background-color: #fbc1c1;
+                    }
+                }
+
+                &_time {
+                    font-size: 12px;
+                    margin-top: 3px;
+                    position: relative;
+
+                    .AnnotationTypeTag {
+                        position: absolute;
+                        right: 5px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        width: 7px;
+                        height: 7px;
+                        border-radius: 3.5px;
+                    }
+                }
+
+            }
+
+            &:hover {
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+                border-color: #d0d0d0;
+            }
+
+            &:hover .ContentBoxItem_Modify_DelButton {
                 opacity: 1;
             }
         }
+
 
         @keyframes box_active {
             0% {
@@ -87,19 +194,9 @@
                 p:nth-child(2) {
                     font-size: 12px;
                     margin-top: 3px;
-                    position: relative;
-
-                    .AnnotationTypeTag {
-                        position: absolute;
-                        right: 0;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        width: 7px;
-                        height: 7px;
-                        border-radius: 3.5px;
-                    }
                 }
             }
+
         }
     }
 

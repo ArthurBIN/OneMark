@@ -1,0 +1,38 @@
+.AnnotationToolbar {
+    padding: 16px;
+    box-sizing: border-box;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .siderBarButton {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .Content {
+        flex: 1;
+        overflow-y: auto;
+        white-space: normal;
+        word-wrap: break-word;
+
+        // 显示状态：稍微延迟淡入，更平滑
+        opacity: 1;
+        transition-property: opacity;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+        transition-delay: 100ms;
+
+        &--hidden {
+            // 隐藏状态：快速淡出，无延迟
+            opacity: 0;
+            transition-duration: 200ms;
+            transition-delay: 0ms;
+        }
+    }
+}

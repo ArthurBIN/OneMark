@@ -3,11 +3,15 @@ import './index.scss'
 interface ActiveBoxProps {
     children: React.ReactNode;
     className?: string;
+    onClick?: () => void;
 }
 
-export const ActiveBox = ({ children, className = '' }: ActiveBoxProps) => {
+export const ActiveBox = ({ children, className = '', onClick }: ActiveBoxProps) => {
     return (
-        <div className={`ActiceBox ${className}`}>
+        <div
+            className={`ActiceBox ${className}`}
+            onClick={onClick}
+        >
             {children}
         </div>
     )
