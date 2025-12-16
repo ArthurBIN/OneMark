@@ -63,6 +63,8 @@ export const Editor = () => {
                 {/* 内容栏 */}
                 <AnnotationContent
                     className='content'
+                    pageData={annotationPageData?.pages}
+                    type={annotationPageData?.type}
                 />
 
                 {/* 侧边栏 */}

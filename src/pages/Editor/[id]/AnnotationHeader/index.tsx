@@ -19,7 +19,7 @@ export const AnnotationHeader = ({
                 className='title'
                 items={[
                     {
-                        href: '',
+                        href: '/dashboard/annotations',
                         title: <HomeOutlined />,
                     },
                     {

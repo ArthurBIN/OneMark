@@ -10,11 +10,9 @@ import type { RadioChangeEvent } from 'antd'
 import { createTextAnnotationWithPage, deleteAnnotation, getMyAnnotations } from "@/lib/api/annotation";
 import type { Annotation } from "@/types/annotations";
 import { formatRelativeTime } from '@/utils/formatTime';
-import { LoadingOutlined, FolderOpenOutlined, DeleteOutlined } from '@ant-design/icons';
-import { MyButton } from "@/components/MyButton";
+import { LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import SimpleTextEditor from "@/components/SimpleTextEditor";
-import { memo } from 'react';
 
 type AnnotationType = 'text' | 'file' | 'img';
 

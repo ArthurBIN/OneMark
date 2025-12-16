@@ -107,8 +107,8 @@ export default function SimpleTextEditor({ value, onChange }: {
     }
 
     return (
-        <div className="editor-container">
-            <div className="editor-toolbar">
+        <div className="simple-editor-container">
+            <div className="simple-editor-toolbar">
                 <div className="toolbar-group">
                     <button
                         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -202,7 +202,7 @@ export default function SimpleTextEditor({ value, onChange }: {
                 </div>
             </div>
 
-            <EditorContent editor={editor} className="editor-content" />
+            <EditorContent editor={editor} className="simple-editor-content" />
         </div>
     )
 }

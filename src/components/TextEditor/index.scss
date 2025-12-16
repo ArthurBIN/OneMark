@@ -1,98 +1,44 @@
-.simple-editor-container {
-    border: 1px solid #eee;
+.editor-container {
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
     background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    max-width: 860px;
-    margin: 1rem auto;
 }
 
-.simple-editor-content {
-    max-height: 300px;
-    overflow-y: auto;
+.editor-content {
+    height: calc(100vh - 90px);
     padding: 24px 30px;
     line-height: 1.7;
     font-size: 16px;
     color: #333;
+    overflow-y: auto;
 
-    /* 隐藏滚动条 - 全平台兼容（Chrome/Edge/Firefox/Safari） */
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
 
+    // 默认隐藏滚动条
     &::-webkit-scrollbar {
-        display: none;
+        width: 4px;
     }
 
-    &:focus-visible {
-        outline: none;
-    }
-}
-
-.simple-editor-toolbar {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2px;
-    padding: 6px 4px;
-    background: #fafafa;
-    border-bottom: 1px solid #eee;
-    user-select: none;
-}
-
-.toolbar-group {
-    display: flex;
-    gap: 1px;
-}
-
-.toolbar-separator {
-    width: 1px;
-    height: 20px;
-    background: #ddd;
-    margin: 0 6px;
-}
-
-.editor-toolbar button {
-    width: 30px;
-    height: 30px;
-    border-radius: 4px;
-    background: transparent;
-    border: 1px solid transparent;
-    color: #555;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-
-    /* Hover 效果：浅灰底 + 浅边框 */
-    &:hover {
-        background: #f0f0f0;
-        border-color: #ddd;
+    &::-webkit-scrollbar-track {
+        background: transparent;
     }
 
-    /* 激活状态：经典蓝色底（和 Word/Google Docs 一样） */
-    &.is-active {
-        background: #e6f3ff;
-        color: #1a73e8;
-        border-color: #a8d1ff;
+    &::-webkit-scrollbar-thumb {
+        background: transparent; // 默认透明
+        border-radius: 2px;
     }
 
-    /* 禁用状态 */
-    &[disabled] {
-        opacity: 0.3;
-        cursor: not-allowed;
-
-        &:hover {
-            background: transparent;
-            border-color: transparent;
-        }
+    // hover 时显示
+    &:hover::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
     }
 
-    svg {
-        pointer-events: none;
+    &:hover::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.4);
     }
 }
-
 
 
 .tiptap {
