@@ -1,0 +1,131 @@
+.highlight-color-picker {
+    position: relative;
+    display: inline-block;
+
+    &__trigger {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: #f5f5f5;
+            border-color: #e0e0e0;
+        }
+
+        &.is-active {
+            background: #e6f7ff;
+            border-color: #1890ff;
+        }
+
+        .remix {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+    }
+
+    &__color-bar {
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    &__menu {
+        position: absolute;
+        top: calc(100% + 2px);
+        left: 0;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        padding: 8px;
+        min-width: 200px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-4px);
+        transition: all 0.2s ease;
+        pointer-events: none;
+
+        &.is-visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    }
+
+    &__colors {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        padding: 4px;
+    }
+
+    &__color-item {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            transform: scale(1.1);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        &.is-active {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+    }
+
+    &__divider {
+        height: 1px;
+        background: #e0e0e0;
+        margin: 8px 0;
+    }
+
+    &__remove {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 8px 12px;
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #666;
+        transition: all 0.2s;
+
+        &:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .remix {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    &__check {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+    }
+}

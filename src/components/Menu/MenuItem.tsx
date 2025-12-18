@@ -9,7 +9,7 @@ export default function MenuItem({
 
     return (
         <>
-            <Tooltip placement="bottom" title={title} color={'black'}>
+            <Tooltip placement="top" title={title} color={'black'}>
                 <button
                     className={`menu-item ${isActive && isActive() ? ' is-active' : ''}`}
                     onClick={action}

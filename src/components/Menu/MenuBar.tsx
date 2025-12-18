@@ -3,25 +3,35 @@ import type { Editor } from '@tiptap/react'
 import { useEditorState } from '@tiptap/react'
 
 import MenuItem from './MenuItem.tsx'
+import HeadingDropdown from './HeadingDropdown/index.tsx'
+import HighlightColorPicker from './HighlightColorPicker/index.tsx'
+import TextColorPicker from './TextColorPicker/index.tsx'
+import FontSizePicker from './FontSizePicker/index.tsx'
 
 export default function MenuBar({ editor }: { editor: Editor }) {
-  useEditorState({
+  const editorState = useEditorState({
     editor,
-    selector: ({ editor }) => ({
-      bold: editor.isActive('bold'),
-      italic: editor.isActive('italic'),
-      strike: editor.isActive('strike'),
-      code: editor.isActive('code'),
-      highlight: editor.isActive('highlight'),
-      h1: editor.isActive('heading', { level: 1 }),
-      h2: editor.isActive('heading', { level: 2 }),
-      bulletList: editor.isActive('bulletList'),
-      orderedList: editor.isActive('orderedList'),
-      taskList: editor.isActive('taskList'),
-      codeBlock: editor.isActive('codeBlock'),
-      blockquote: editor.isActive('blockquote'),
-    }),
+    selector: ({ editor }) => {
+      // 直接从当前选区获取 textAlign 属性
+      const { textAlign } = editor.getAttributes('textStyle')
+      const currentAlign = textAlign || editor.getAttributes('paragraph').textAlign || editor.getAttributes('heading').textAlign || 'left'
+
+      return {
+        bold: editor.isActive('bold'),
+        italic: editor.isActive('italic'),
+        strike: editor.isActive('strike'),
+        code: editor.isActive('code'),
+        highlight: editor.isActive('highlight'),
+        bulletList: editor.isActive('bulletList'),
+        orderedList: editor.isActive('orderedList'),
+        taskList: editor.isActive('taskList'),
+        codeBlock: editor.isActive('codeBlock'),
+        blockquote: editor.isActive('blockquote'),
+        textAlign: currentAlign,
+      }
+    },
   })
+
   const items = [
     {
       icon: 'bold',
@@ -36,43 +46,61 @@ export default function MenuBar({ editor }: { editor: Editor }) {
       isActive: () => editor.isActive('italic'),
     },
     {
+      icon: 'underline',
+      title: '下划线',
+      action: () => editor.chain().focus().toggleUnderline().run(),
+      isActive: () => editor.isActive('underline'),
+    },
+    {
       icon: 'strikethrough',
       title: '删除线',
       action: () => editor.chain().focus().toggleStrike().run(),
       isActive: () => editor.isActive('strike'),
     },
     {
-      icon: 'code-view',
-      title: '代码',
-      action: () => editor.chain().focus().toggleCode().run(),
-      isActive: () => editor.isActive('code'),
+      type: 'text-color-picker',
     },
     {
-      icon: 'mark-pen-line',
-      title: '高亮',
-      action: () => editor.chain().focus().toggleHighlight().run(),
-      isActive: () => editor.isActive('highlight'),
+      type: 'highlight-color-picker',
+    },
+    {
+      type: 'font-size-picker',
     },
     {
       type: 'divider',
     },
     {
-      icon: 'h-1',
-      title: '一级标题',
-      action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      isActive: () => editor.isActive('heading', { level: 1 }),
+      type: 'heading-dropdown',
     },
     {
-      icon: 'h-2',
-      title: '二级标题',
-      action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      isActive: () => editor.isActive('heading', { level: 2 }),
+      type: 'divider',
     },
     {
-      icon: 'paragraph',
-      title: '段落',
-      action: () => editor.chain().focus().setParagraph().run(),
-      isActive: () => editor.isActive('paragraph'),
+      icon: 'align-left',
+      title: '左对齐',
+      action: () => editor.chain().focus().setTextAlign('left').run(),
+      isActive: () => editorState.textAlign === 'left',
+    },
+    {
+      icon: 'align-center',
+      title: '居中对齐',
+      action: () => editor.chain().focus().setTextAlign('center').run(),
+      isActive: () => editorState.textAlign === 'center',
+    },
+    {
+      icon: 'align-right',
+      title: '右对齐',
+      action: () => editor.chain().focus().setTextAlign('right').run(),
+      isActive: () => editorState.textAlign === 'right',
+    },
+    {
+      icon: 'align-justify',
+      title: '两端对齐',
+      action: () => editor.chain().focus().setTextAlign('justify').run(),
+      isActive: () => editorState.textAlign === 'justify',
+    },
+    {
+      type: 'divider',
     },
     {
       icon: 'list-unordered',
@@ -144,12 +172,19 @@ export default function MenuBar({ editor }: { editor: Editor }) {
     <div className="editor__header">
       {items.map((item, index) => (
         <div key={index}>
-          {
-            item?.type === 'divider' ?
-              <div className="divider" />
-              :
-              <MenuItem {...item} />
-          }
+          {item?.type === 'divider' ? (
+            <div className="divider" />
+          ) : item?.type === 'heading-dropdown' ? (
+            <HeadingDropdown editor={editor} />
+          ) : item?.type === 'highlight-color-picker' ? (
+            <HighlightColorPicker editor={editor} />
+          ) : item?.type === 'text-color-picker' ? (
+            <TextColorPicker editor={editor} />
+          ) : item?.type === 'font-size-picker' ? (
+            <FontSizePicker editor={editor} />
+          ) : (
+            <MenuItem {...item} />
+          )}
         </div>
       ))}
     </div>

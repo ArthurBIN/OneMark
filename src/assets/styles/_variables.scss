@@ -8,6 +8,84 @@
     --border-gray: #E1E3E1;
 }
 
+
+
+.tiptap {
+    border: 0;
+    outline: none;
+
+    &::after {
+        content: '';
+        display: block;
+        height: 60px;
+    }
+
+    ul,
+    ol {
+        padding: 0 1rem;
+        margin: 1.25rem 1rem 1.25rem 0.4rem;
+
+        li p {
+            margin-top: 0.25em;
+            margin-bottom: 0.25em;
+        }
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        line-height: 1.1;
+        text-wrap: pretty;
+        margin-bottom: 1.5rem;
+    }
+
+    pre {
+        background: black;
+        border-radius: 0.5rem;
+        color: white;
+        font-family: 'JetBrainsMono', monospace;
+        margin: 1.5rem 0;
+        padding: 0.75rem 1rem;
+
+        code {
+            background: none;
+            color: inherit;
+            font-size: 0.8rem;
+            padding: 0;
+        }
+    }
+
+    mark {
+        border-radius: 0.4rem;
+        box-decoration-break: clone;
+        padding: 0.1rem 0.3rem;
+    }
+
+    blockquote {
+        border-left: 3px solid #E7E4E2;
+        margin: 1.5rem 0;
+        padding-left: 1rem;
+    }
+
+    hr {
+        border: none;
+        border-top: 1px solid #F0EEED;
+        margin: 2rem 0;
+    }
+
+    a {
+        color: #1a73e8;
+        text-decoration: underline;
+    }
+}
+
+
+
+
+
 @font-face {
     font-family: "阿里妈妈东方大楷 Regular";
     font-weight: 400;
