@@ -7,6 +7,7 @@ import { AnnotationSidebar } from './AnnotationSidebar';
 import { useEffect, useState } from 'react';
 import type { AnnotationDetail } from '@/types/annotations';
 import { getAnnotation } from '@/lib/api/annotation';
+import { DrawingProvider } from '@/contexts/DrawingContext';
 
 export const Editor = () => {
     const params = useParams();
@@ -53,24 +54,27 @@ export const Editor = () => {
             />
 
             <div className='Main'>
-                {/* 工具栏 */}
-                <AnnotationToolbar
-                    className={`${isSiderBar ? 'toolbar_hidden' : 'toolbar'}`}
-                    isHidden={isSiderBar}
-                    handleHiddenSiderBar={handleHiddenSiderBar}
-                />
+                <DrawingProvider>
+                    {/* 工具栏 */}
+                    <AnnotationToolbar
+                        className={`${isSiderBar ? 'toolbar_hidden' : 'toolbar'}`}
+                        isHidden={isSiderBar}
+                        handleHiddenSiderBar={handleHiddenSiderBar}
+                    />
 
-                {/* 内容栏 */}
-                <AnnotationContent
-                    className='content'
-                    pageData={annotationPageData?.pages}
-                    type={annotationPageData?.type}
-                />
+                    {/* 内容栏 */}
+                    <AnnotationContent
+                        className='content'
+                        pageData={annotationPageData?.pages}
+                        type={annotationPageData?.type}
+                    />
 
-                {/* 侧边栏 */}
-                <AnnotationSidebar
-                    className='sidebar'
-                />
+                    {/* 侧边栏 */}
+                    <AnnotationSidebar
+                        className='sidebar'
+                    />
+                </DrawingProvider>
+
             </div>
         </div>
     );

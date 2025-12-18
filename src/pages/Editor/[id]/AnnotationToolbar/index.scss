@@ -7,7 +7,7 @@
     flex-direction: column;
     overflow: hidden;
 
-    .siderBarButton {
+    &_CloseButton {
         position: absolute;
         top: 16px;
         right: 16px;
@@ -15,24 +15,93 @@
         z-index: 10;
     }
 
-    .Content {
+    &_Content {
         flex: 1;
         overflow-y: auto;
         white-space: normal;
         word-wrap: break-word;
-
-        // 显示状态：稍微延迟淡入，更平滑
         opacity: 1;
         transition-property: opacity;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         transition-duration: 300ms;
         transition-delay: 100ms;
 
-        &--hidden {
-            // 隐藏状态：快速淡出，无延迟
+        &_Hidden {
             opacity: 0;
             transition-duration: 200ms;
             transition-delay: 0ms;
+        }
+    }
+}
+
+.AnnotationToolbar_ToolGroup {
+    width: 100%;
+    font-size: 16px;
+
+    .AnnotationToolbar_ToolGroupHeader {
+        border-radius: 0.4rem;
+        color: #000000;
+        cursor: pointer;
+        padding: 5px 8px;
+        display: inline-block;
+        box-sizing: border-box;
+        margin-top: 2rem;
+        position: relative;
+
+        .AnnotationToolbar_ToolGroupTitle {
+            font-size: 14px;
+            margin-left: 4px;
+        }
+
+        .AnnotationToolbar_Border {
+            width: 2px;
+            height: 10px;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #000000;
+        }
+    }
+
+    .AnnotationToolbar_ToolGroupHeader:hover {
+        background-color: #000000;
+        color: #fff;
+    }
+
+    .AnnotationToolbar_ToolList {
+        display: flex;
+        margin-top: 1rem;
+
+        .AnnotationToolbar_ToolItem {
+            border-radius: 0.4rem;
+            color: #000000;
+            cursor: pointer;
+            height: 40px;
+            margin-right: 0.25rem;
+            padding: 0.25rem;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-sizing: border-box;
+
+            &_XiangPi {
+                font-size: 14px;
+            }
+
+            &:hover {
+                background-color: #000000;
+                color: #fff;
+                cursor: pointer;
+            }
+
+            &_Active {
+                background-color: #000000;
+                color: #fff;
+                cursor: pointer;
+            }
         }
     }
 }

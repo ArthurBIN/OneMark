@@ -1,0 +1,6 @@
+.drawing-canvas {
+    position: fixed;
+    z-index: 9999;
+    cursor: crosshair;
+    pointer-events: auto;
+}

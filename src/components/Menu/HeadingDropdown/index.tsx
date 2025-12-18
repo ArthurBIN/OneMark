@@ -2,7 +2,6 @@ import './index.scss'
 import { useState, useRef, useEffect } from 'react'
 import type { Editor } from '@tiptap/react'
 import { useEditorState } from '@tiptap/react'
-import remixiconUrl from 'remixicon/fonts/remixicon.symbol.svg'
 
 interface HeadingOption {
     label: string
@@ -92,13 +91,9 @@ export default function HeadingDropdown({ editor }: { editor: Editor }) {
                 onClick={() => setIsOpen(!isOpen)}
                 title="选择标题级别"
             >
-                <svg className="remix">
-                    <use xlinkHref={`${remixiconUrl}#ri-${activeOption.icon}`} />
-                </svg>
+                <i className={`ri-${activeOption.icon} remix`} />
                 <span className="heading-dropdown__label">{activeOption.label}</span>
-                <svg className="remix heading-dropdown__arrow">
-                    <use xlinkHref={`${remixiconUrl}#ri-arrow-down-s-line`} />
-                </svg>
+                <i className={`ri-arrow-down-s-line remix heading-dropdown__arrow`} />
             </button>
 
             {isOpen && (
@@ -109,14 +104,11 @@ export default function HeadingDropdown({ editor }: { editor: Editor }) {
                             className={`heading-dropdown__item ${option.isActive() ? 'is-active' : ''}`}
                             onClick={() => handleOptionClick(option)}
                         >
-                            <svg className="remix">
-                                <use xlinkHref={`${remixiconUrl}#ri-${option.icon}`} />
-                            </svg>
+                            <i className={`ri-${option.icon} remix`} />
+
                             <span>{option.label}</span>
                             {option.isActive() && (
-                                <svg className="remix heading-dropdown__check">
-                                    <use xlinkHref={`${remixiconUrl}#ri-check-line`} />
-                                </svg>
+                                <i className={`ri-check-line remix heading-dropdown__check`} />
                             )}
                         </button>
                     ))}

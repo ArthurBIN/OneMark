@@ -10,7 +10,6 @@ type TextContentProps = {
 export default function TextContent({
     pageData = []
 }: TextContentProps) {
-
     const [textContent, setTextContent] = useState(pageData?.[0].text_content)
 
     return (

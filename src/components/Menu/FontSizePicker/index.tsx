@@ -1,7 +1,6 @@
 import './index.scss'
 import { useState, useRef, useEffect } from 'react'
 import type { Editor } from '@tiptap/react'
-import remixiconUrl from 'remixicon/fonts/remixicon.symbol.svg'
 import { Tooltip } from 'antd'
 
 const FONT_SIZES = [
@@ -44,12 +43,8 @@ export default function FontSizePicker({ editor }: { editor: Editor }) {
                     className="font-size-picker__trigger"
                     onClick={() => setIsOpen(!isOpen)}
                 >
-                    <svg className="remix">
-                        <use xlinkHref={`${remixiconUrl}#ri-font-size`} />
-                    </svg>
-                    <svg className="remix font-size-picker__arrow">
-                        <use xlinkHref={`${remixiconUrl}#ri-arrow-down-s-line`} />
-                    </svg>
+                    <i className="ri-font-size remix" />
+                    <i className="ri-arrow-down-s-line remix font-size-picker__arrow" />
                 </button>
             </Tooltip>
 
