@@ -82,10 +82,20 @@ export const AnnotationToolbar = ({
                             <i className="ri-square-line" />
                         </div>
                         <div className="AnnotationToolbar_ToolItem">
+                            <i className="ri-square-fill" />
+                        </div>
+                        <div className="AnnotationToolbar_ToolItem">
                             <i className="ri-circle-line" />
                         </div>
                         <div className="AnnotationToolbar_ToolItem">
+                            <i className="ri-circle-fill" />
+                        </div>
+                        <div className="AnnotationToolbar_ToolItem">
                             <i className="ri-triangle-line" />
+                        </div>
+
+                        <div className="AnnotationToolbar_ToolItem">
+                            <i className="ri-triangle-fill" />
                         </div>
                         <div className="AnnotationToolbar_ToolItem">
                             <i className="ri-subtract-line" />

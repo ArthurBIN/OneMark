@@ -71,7 +71,8 @@
 
     .AnnotationToolbar_ToolList {
         display: flex;
-        margin-top: 1rem;
+        width: 100%;
+        flex-wrap: wrap;
 
         .AnnotationToolbar_ToolItem {
             border-radius: 0.4rem;
@@ -79,6 +80,7 @@
             cursor: pointer;
             height: 40px;
             margin-right: 0.25rem;
+            margin-top: 1rem;
             padding: 0.25rem;
             width: 40px;
             display: flex;

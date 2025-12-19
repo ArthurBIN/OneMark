@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
+    "@reduxjs/toolkit": "^2.11.2",
     "@supabase/supabase-js": "^2.81.1",
     "@tiptap/extension-character-count": "^3.13.0",
     "@tiptap/extension-color": "^3.13.0",
@@ -30,6 +31,7 @@
     "lucide-react": "^0.560.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.6",
     "remixicon": "^4.7.0"
   },

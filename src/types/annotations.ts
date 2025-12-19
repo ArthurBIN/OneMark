@@ -1,7 +1,7 @@
 export type AnnotationType = 'text' | 'file' | 'img';
 export type ContentType = 'text' | 'pdf' | 'word' | 'image';
 export type TextAnnotationType = 'highlight' | 'underline' | 'strikethrough' | 'comment';
-export type DrawingType = 'pencil' | 'pen' | 'marker' | 'brush' | 'circle' | 'arrow' | 'line' | 'text_box';
+export type DrawingType = 'pencil' | 'pen' | 'marker' | 'brush' | 'circle' | 'arrow' | 'line' | 'text_box' | null;
 
 export type Annotation = {
     id: string;

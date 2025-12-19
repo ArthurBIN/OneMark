@@ -1,18 +1,19 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
+import type { DrawingType } from '@/types/annotations'
 
 type DrawingContextType = {
     isDrawingMode: boolean
     setIsDrawingMode: (value: boolean) => void
-    drawingTool: 'pencil' | 'pen' | 'marker' | 'brush' | null
-    setDrawingTool: (tool: 'pencil' | 'pen' | 'marker' | 'brush' | null) => void
+    drawingTool: DrawingType
+    setDrawingTool: (tool: DrawingType) => void
 }
 
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined)
 
 export function DrawingProvider({ children }: { children: ReactNode }) {
     const [isDrawingMode, setIsDrawingMode] = useState(false)
-    const [drawingTool, setDrawingTool] = useState<'pencil' | 'pen' | 'marker' | 'brush' | null>(null)
+    const [drawingTool, setDrawingTool] = useState<DrawingType>(null)
 
     return (
         <DrawingContext.Provider

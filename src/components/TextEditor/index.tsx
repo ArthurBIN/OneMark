@@ -13,8 +13,11 @@ import { FontSize } from './extensions/fontSize'
 import './index.scss'
 import MenuBar from '../Menu/MenuBar'
 import { useDrawing } from '@/contexts/DrawingContext';
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import DrawingCanvas from '@/components/DrawingCanvas';
+import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch, RootState } from "@/store"
+import { setColor, setLineWidth, setTool } from '@/store/modules/drawingSlice'
 
 
 export default function TextEditor({ value, onChange }: {
@@ -48,26 +51,57 @@ export default function TextEditor({ value, onChange }: {
         }
     })
 
-    const editorContainerRef = useRef<HTMLDivElement | null>(null)
-    const { isDrawingMode, drawingTool } = useDrawing()
+    const dispatch = useDispatch<AppDispatch>()
 
-    // 根据不同工具设置不同的绘画参数
-    const getDrawingProps = () => {
+    const {
+        tool,
+        color,
+        lineWidth
+    } = useSelector((state: RootState) => state.drawing)
+
+    const editorContainerRef = useRef<HTMLDivElement | null>(null);
+    const { isDrawingMode, drawingTool, setIsDrawingMode, setDrawingTool } = useDrawing();
+
+    // 监听右键取消绘图事件
+    useEffect(() => {
+        const handleCancelDrawing = () => {
+            setIsDrawingMode(false);
+            setDrawingTool(null);
+        }
+
+        window.addEventListener('cancelDrawing', handleCancelDrawing);
+
+        return () => {
+            window.removeEventListener('cancelDrawing', handleCancelDrawing);
+        }
+    }, [setIsDrawingMode, setDrawingTool]);
+
+    useEffect(() => {
+        dispatch(setTool(drawingTool))
+
         switch (drawingTool) {
             case 'pencil':
-                return { color: '#000000', lineWidth: 2 }
+                dispatch(setColor('#000000'));
+                dispatch(setLineWidth(2));
+                return;
             case 'pen':
-                return { color: '#000000', lineWidth: 3 }
+                dispatch(setColor('#000000'));
+                dispatch(setLineWidth(3));
+                return;
             case 'marker':
-                return { color: '#ffeb3b', lineWidth: 8 }
+                dispatch(setColor('#ffeb3b'));
+                dispatch(setLineWidth(8));
+                return;
             case 'brush':
-                return { color: '#000000', lineWidth: 5 }
+                dispatch(setColor('#000000'));
+                dispatch(setLineWidth(5));
+                return;
             default:
-                return { color: '#000000', lineWidth: 2 }
+                dispatch(setColor('#000000'));
+                dispatch(setLineWidth(2));
+                return;
         }
-    }
-
-    const drawingProps = getDrawingProps()
+    }, [drawingTool])
 
     if (!editor) return null
 
@@ -81,8 +115,9 @@ export default function TextEditor({ value, onChange }: {
                     <DrawingCanvas
                         isActive={isDrawingMode}
                         targetRef={editorContainerRef}
-                        color={drawingProps.color}
-                        lineWidth={drawingProps.lineWidth}
+                        color={color}
+                        lineWidth={lineWidth}
+                        tool={tool}
                     />
                 )}
             </div>
