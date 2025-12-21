@@ -81,11 +81,9 @@ export default function TextEditor({ value, onChange }: {
 
         switch (drawingTool) {
             case 'pencil':
-                dispatch(setColor('#000000'));
                 dispatch(setLineWidth(2));
                 return;
             case 'pen':
-                dispatch(setColor('#000000'));
                 dispatch(setLineWidth(3));
                 return;
             case 'marker':
@@ -93,11 +91,9 @@ export default function TextEditor({ value, onChange }: {
                 dispatch(setLineWidth(8));
                 return;
             case 'brush':
-                dispatch(setColor('#000000'));
                 dispatch(setLineWidth(5));
                 return;
             default:
-                dispatch(setColor('#000000'));
                 dispatch(setLineWidth(2));
                 return;
         }

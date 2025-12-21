@@ -70,9 +70,9 @@ export const Editor = () => {
                     />
 
                     {/* 侧边栏 */}
-                    <AnnotationSidebar
+                    {/* <AnnotationSidebar
                         className='sidebar'
-                    />
+                    /> */}
                 </DrawingProvider>
 
             </div>

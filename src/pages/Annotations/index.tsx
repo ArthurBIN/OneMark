@@ -5,7 +5,7 @@ import './index.scss'
 import addImg from '@/assets/img/add.png'
 import { Modal } from "@/components/Modal";
 import { MyInput } from "@/components/MyInput";
-import { message, Radio, ConfigProvider, Switch } from 'antd';
+import { message, Radio, Switch } from 'antd';
 import type { RadioChangeEvent } from 'antd'
 import { createTextAnnotationWithPage, deleteAnnotation, getMyAnnotations } from "@/lib/api/annotation";
 import type { Annotation } from "@/types/annotations";
@@ -251,47 +251,25 @@ export const Annotations = () => {
                     onChange={(e) => setTitleText(e.target.value)}
                 />
                 <p style={{ marginTop: '10px' }}>类型</p>
-                <ConfigProvider
-                    theme={{
-                        components: {
-                            Radio: {
-                                colorPrimary: '#000000',
-                            },
-                        },
-                    }}
-                >
-                    <Radio.Group
-                        onChange={onChange}
-                        value={annotationType}
-                        style={{ marginTop: '10px' }}
-                        options={[
-                            { value: 'text', label: '文本' },
-                            { value: 'file', label: '文件' },
-                            { value: 'img', label: '图片' },
-                        ]}
-                    />
-                </ConfigProvider>
+                <Radio.Group
+                    onChange={onChange}
+                    value={annotationType}
+                    style={{ marginTop: '10px' }}
+                    options={[
+                        { value: 'text', label: '文本' },
+                        { value: 'file', label: '文件' },
+                        { value: 'img', label: '图片' },
+                    ]}
+                />
                 <p style={{ marginTop: '30px' }}>隐私</p>
-                <ConfigProvider
-                    theme={{
-                        components: {
-                            Switch: {
-                                colorPrimary: '#000000',
-                                colorPrimaryHover: '#333333',
-                                colorTextQuaternary: '#d9d9d9',
-                            },
-                        },
-                    }}
-                >
-                    <Switch
-                        checked={isPublic}
-                        onChange={setIsPublic}
-                        checkedChildren="公开"
-                        unCheckedChildren="私密"
-                        defaultChecked
-                        style={{ marginTop: '10px' }}
-                    />
-                </ConfigProvider>
+                <Switch
+                    checked={isPublic}
+                    onChange={setIsPublic}
+                    checkedChildren="公开"
+                    unCheckedChildren="私密"
+                    defaultChecked
+                    style={{ marginTop: '10px' }}
+                />
             </Modal>
 
             {/* 新增文本弹窗 */}

@@ -9,7 +9,7 @@ interface DrawingStateType {
 }
 
 const initialState: DrawingStateType = {
-    color: '',
+    color: '#000000',
     lineWidth: 0,
     tool: null,
 }

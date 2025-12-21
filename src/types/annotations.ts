@@ -1,7 +1,24 @@
 export type AnnotationType = 'text' | 'file' | 'img';
 export type ContentType = 'text' | 'pdf' | 'word' | 'image';
 export type TextAnnotationType = 'highlight' | 'underline' | 'strikethrough' | 'comment';
-export type DrawingType = 'pencil' | 'pen' | 'marker' | 'brush' | 'circle' | 'arrow' | 'line' | 'text_box' | null;
+
+export type DrawingType =
+    | 'pencil'
+    | 'pen'
+    | 'marker'
+    | 'brush'
+    | 'rectangle'      // 矩形（空心）
+    | 'rectangle-fill' // 矩形（实心）
+    | 'circle'         // 圆形（空心）
+    | 'circle-fill'    // 圆形（实心）
+    | 'triangle'       // 三角形（空心）
+    | 'triangle-fill'  // 三角形（实心）
+    | 'line'           // 直线
+    | 'arrow'          // 箭头
+    | 'eraser'         // 橡皮擦
+    | null
+
+
 
 export type Annotation = {
     id: string;

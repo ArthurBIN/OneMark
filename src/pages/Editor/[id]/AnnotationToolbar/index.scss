@@ -106,4 +106,29 @@
             }
         }
     }
+
+    .AnnotationToolbar_Control {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+        padding-left: 8px;
+        box-sizing: border-box;
+        margin-top: 1rem;
+
+        &_Slider {
+            flex: 1;
+        }
+
+        &_InputNumber {
+            width: 60px;
+            margin-left: 10px;
+            border-width: 1px !important;
+
+            &.ant-input-number-focused,
+            &:focus-within {
+                border-width: 1px !important;
+                box-shadow: none !important;
+            }
+        }
+    }
 }
