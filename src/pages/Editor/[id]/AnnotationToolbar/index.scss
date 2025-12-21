@@ -21,15 +21,9 @@
         white-space: normal;
         word-wrap: break-word;
         opacity: 1;
-        transition-property: opacity;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        transition-duration: 300ms;
-        transition-delay: 100ms;
 
         &_Hidden {
             opacity: 0;
-            transition-duration: 200ms;
-            transition-delay: 0ms;
         }
     }
 }

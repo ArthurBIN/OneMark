@@ -25,6 +25,14 @@ export const Dashboard = () => {
                         <span>项目</span>
                     </GlowCard>
                     <GlowCard
+                        onClick={() => navigate('/dashboard/cooperation')}
+                        isShow={location.pathname !== '/dashboard/cooperation'}
+                        className={`btnItem ${location.pathname === '/dashboard/cooperation' ? 'activeBtnItem' : 'noactiveBtnItem'}`}
+                    >
+                        <FileTextOutlined />
+                        <span>协作</span>
+                    </GlowCard>
+                    <GlowCard
                         onClick={() => navigate('/dashboard/settings')}
                         isShow={location.pathname !== '/dashboard/settings'}
                         className={`btnItem ${location.pathname === '/dashboard/settings' ? 'activeBtnItem' : 'noactiveBtnItem'}`}

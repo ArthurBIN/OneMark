@@ -1,7 +1,7 @@
 import './index.scss'
-import { useState, useRef, useEffect } from 'react'
 import type { Editor } from '@tiptap/react'
 import { useEditorState } from '@tiptap/react'
+import { Popover, Tooltip } from 'antd'
 
 interface HeadingOption {
     label: string
@@ -12,10 +12,6 @@ interface HeadingOption {
 }
 
 export default function HeadingDropdown({ editor }: { editor: Editor }) {
-    const [isOpen, setIsOpen] = useState(false)
-    const dropdownRef = useRef<HTMLDivElement>(null)
-
-    // 使用 useEditorState 监听编辑器状态变化
     const editorState = useEditorState({
         editor,
         selector: ({ editor }) => ({
@@ -61,59 +57,46 @@ export default function HeadingDropdown({ editor }: { editor: Editor }) {
             icon: 'h-4',
             action: () => editor.chain().focus().toggleHeading({ level: 4 }).run(),
             isActive: () => editor.isActive('heading', { level: 4 }),
-        }
+        },
     ]
 
-    // 获取当前激活的选项
     const activeOption = options.find(option => option.isActive()) || options[0]
 
-    // 点击外部关闭下拉框
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false)
-            }
-        }
-
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
-
-    const handleOptionClick = (option: HeadingOption) => {
-        option.action()
-        setIsOpen(false)
-    }
+    /** Popover 内容 */
+    const popoverContent = (
+        <div style={{ width: 150 }}>
+            {options.map(option => (
+                <button
+                    key={option.label}
+                    className={`heading-dropdown__item ${option.isActive() ? 'is-active' : ''
+                        }`}
+                    onClick={option.action}
+                >
+                    <i className={`ri-${option.icon} remix`} />
+                    <span>{option.label}</span>
+                    {option.isActive() && (
+                        <i className="ri-check-line remix heading-dropdown__check" />
+                    )}
+                </button>
+            ))}
+        </div>
+    )
 
     return (
-        <div className="heading-dropdown" ref={dropdownRef}>
-            <button
-                className={`heading-dropdown__trigger ${isOpen ? 'is-open' : ''}`}
-                onClick={() => setIsOpen(!isOpen)}
-                title="选择标题级别"
-            >
-                <i className={`ri-${activeOption.icon} remix`} />
-                <span className="heading-dropdown__label">{activeOption.label}</span>
-                <i className={`ri-arrow-down-s-line remix heading-dropdown__arrow`} />
-            </button>
-
-            {isOpen && (
-                <div className="heading-dropdown__menu">
-                    {options.map((option, index) => (
-                        <button
-                            key={index}
-                            className={`heading-dropdown__item ${option.isActive() ? 'is-active' : ''}`}
-                            onClick={() => handleOptionClick(option)}
-                        >
-                            <i className={`ri-${option.icon} remix`} />
-
-                            <span>{option.label}</span>
-                            {option.isActive() && (
-                                <i className={`ri-check-line remix heading-dropdown__check`} />
-                            )}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
+        <Popover
+            placement="bottomLeft"
+            trigger="click"
+            content={popoverContent}
+        >
+            <Tooltip title="选择标题级别" placement="top">
+                <button className="heading-dropdown__trigger">
+                    <i className={`ri-${activeOption.icon} remix`} />
+                    <span className="heading-dropdown__label">
+                        {activeOption.label}
+                    </span>
+                    <i className="ri-arrow-down-s-line remix heading-dropdown__arrow" />
+                </button>
+            </Tooltip>
+        </Popover>
     )
 }

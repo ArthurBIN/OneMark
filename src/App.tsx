@@ -10,6 +10,7 @@ import { Editor } from '@/pages/Editor/[id]';
 import { Preview } from '@/pages/Preview';
 import { Settings } from '@/pages/Settings';
 import { Annotations } from '@/pages/Annotations';
+import Cooperation from './pages/Cooperation';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />}>
             <Route index element={<Navigate to="annotations" replace />} />
             <Route path="annotations" element={<Annotations />} />
+            <Route path="cooperation" element={<Cooperation />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

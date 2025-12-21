@@ -1,47 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import type { RootState, AppDispatch } from '@/store'
+import { addObject, removeObjectAtPoint } from '@/store/modules/drawingSlice'
 import './index.scss'
-import type { DrawingType } from '@/types/annotations'
-
-type Point = {
-    x: number
-    y: number
-    ox?: number
-    oy?: number
-    pressure?: number  // 添加压力值，用于钢笔粗细变化
-}
-
-// 统一的绘图对象类型
-type DrawingObject = {
-    type: 'path' | 'shape'
-    tool: DrawingType
-    color: string
-    lineWidth: number
-    // path 类型使用
-    points?: Point[]
-    // shape 类型使用
-    startPoint?: Point
-    endPoint?: Point
-}
+import type { DrawingType, Point, DrawingObject } from '@/types/drawing'
 
 type DrawingCanvasProps = {
     isActive: boolean
     targetRef: React.RefObject<HTMLElement | null>
-    color?: string
-    lineWidth?: number
-    tool?: DrawingType
 }
 
 export default function DrawingCanvas({
     isActive,
     targetRef,
-    color = '#000000',
-    lineWidth = 2,
-    tool = 'pencil'
 }: DrawingCanvasProps) {
+    const dispatch = useDispatch<AppDispatch>()
+
+    // 从 Redux 获取状态
+    const { objects, tool, color, lineWidth } = useSelector((state: RootState) => state.drawing)
+
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
     const [isDrawing, setIsDrawing] = useState(false)
-    const [objects, setObjects] = useState<DrawingObject[]>([])
     const [currentPath, setCurrentPath] = useState<Point[]>([])
     const [shapeStart, setShapeStart] = useState<Point | null>(null)
     const [shapePreview, setShapePreview] = useState<Point | null>(null)
@@ -74,15 +54,11 @@ export default function DrawingCanvas({
                 return 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'%3E%3Cpath fill=\'%23ff6b6b\' stroke=\'%23000\' stroke-width=\'1\' d=\'M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53a4.008 4.008 0 0 1-5.66 0L2.81 17c-.78-.79-.78-2.05 0-2.84l10.6-10.6c.79-.78 2.05-.78 2.83 0zM4.22 15.58l3.54 3.53c.78.79 2.04.79 2.83 0l3.53-3.53-6.36-6.36-3.54 3.53c-.78.79-.78 2.05 0 2.83z\'/%3E%3C/svg%3E") 4 20, auto'
             case 'rectangle':
             case 'rectangle-fill':
-                return 'crosshair'
             case 'circle':
             case 'circle-fill':
-                return 'crosshair'
             case 'triangle':
             case 'triangle-fill':
-                return 'crosshair'
             case 'line':
-                return 'crosshair'
             case 'arrow':
                 return 'crosshair'
             default:
@@ -116,19 +92,12 @@ export default function DrawingCanvas({
             ctx.imageSmoothingQuality = 'high'
 
             setContext(ctx)
-            // 重绘时使用当前的 objects
             redrawAll(ctx, objects)
         }
 
-        // 初始化
         updateCanvasSize()
 
-        // 监听窗口大小变化
-        const handleResize = () => {
-            updateCanvasSize()
-        }
-
-        // 监听滚动
+        const handleResize = () => updateCanvasSize()
         const handleScroll = () => {
             if (!target) return
             const rect = target.getBoundingClientRect()
@@ -136,10 +105,7 @@ export default function DrawingCanvas({
             canvas.style.top = `${rect.top}px`
         }
 
-        // 使用 ResizeObserver 监听目标元素大小变化
-        const resizeObserver = new ResizeObserver(() => {
-            updateCanvasSize()
-        })
+        const resizeObserver = new ResizeObserver(() => updateCanvasSize())
         resizeObserver.observe(target)
 
         window.addEventListener('resize', handleResize)
@@ -150,7 +116,7 @@ export default function DrawingCanvas({
             window.removeEventListener('resize', handleResize)
             window.removeEventListener('scroll', handleScroll, true)
         }
-    }, [isActive, objects]) // 添加 objects 到依赖数组
+    }, [isActive, objects])
 
     /* ---------------- 重绘所有对象 ---------------- */
     const redrawAll = (ctx: CanvasRenderingContext2D, objList: DrawingObject[]) => {
@@ -179,7 +145,7 @@ export default function DrawingCanvas({
 
         // 橡皮擦模式：点击删除整条线/图形
         if (isEraserTool(tool)) {
-            deleteObjectAt(point)
+            dispatch(removeObjectAtPoint(point))
             return
         }
 
@@ -200,24 +166,20 @@ export default function DrawingCanvas({
         const point = getPoint(e)
 
         if (isPathTool(tool)) {
-            // 路径绘制
             let enhancedPoint: Point = point
 
             if (tool === 'brush') {
-                // 毛笔：添加随机偏移
                 enhancedPoint = {
                     ...point,
                     ox: (Math.random() - 0.5) * 2,
                     oy: (Math.random() - 0.5) * 2
                 }
             } else if (tool === 'pen') {
-                // 钢笔：计算速度作为压力值
                 if (currentPath.length > 0) {
                     const lastPoint = currentPath[currentPath.length - 1]
                     const dx = point.x - lastPoint.x
                     const dy = point.y - lastPoint.y
                     const distance = Math.sqrt(dx * dx + dy * dy)
-                    // 距离越大（速度越快），压力值越小（线条越细）
                     const pressure = Math.max(0.3, Math.min(1.5, 5 / (distance + 1)))
                     enhancedPoint = { ...point, pressure }
                 } else {
@@ -228,13 +190,12 @@ export default function DrawingCanvas({
             const newPath = [...currentPath, enhancedPoint]
             setCurrentPath(newPath)
 
-            // 实时预览当前路径
+            // 实时预览
             redrawAll(context, [
                 ...objects,
                 { type: 'path', tool, color, lineWidth, points: newPath }
             ])
         } else if (isShapeTool(tool) && shapeStart) {
-            // 图形预览
             setShapePreview(point)
             redrawAll(context, [
                 ...objects,
@@ -249,45 +210,29 @@ export default function DrawingCanvas({
         setIsDrawing(false)
 
         if (isPathTool(tool) && currentPath.length > 1) {
-            // 保存路径
-            setObjects(prev => [
-                ...prev,
-                { type: 'path', tool, color, lineWidth, points: currentPath }
-            ])
+            // 保存到 Redux
+            dispatch(addObject({
+                type: 'path',
+                tool,
+                color,
+                lineWidth,
+                points: currentPath
+            }))
         } else if (isShapeTool(tool) && shapeStart && shapePreview) {
-            // 保存图形
-            setObjects(prev => [
-                ...prev,
-                { type: 'shape', tool, color, lineWidth, startPoint: shapeStart, endPoint: shapePreview }
-            ])
+            // 保存到 Redux
+            dispatch(addObject({
+                type: 'shape',
+                tool,
+                color,
+                lineWidth,
+                startPoint: shapeStart,
+                endPoint: shapePreview
+            }))
         }
 
         setCurrentPath([])
         setShapeStart(null)
         setShapePreview(null)
-    }
-
-    /* ---------------- 橡皮擦：点击删除整个对象 ---------------- */
-    const deleteObjectAt = (point: Point) => {
-        setObjects(prev => prev.filter(obj => {
-            if (obj.type === 'path' && obj.points) {
-                // 检查点击是否在路径附近
-                return !obj.points.some(p => {
-                    const dx = p.x - point.x
-                    const dy = p.y - point.y
-                    return Math.sqrt(dx * dx + dy * dy) < 15 // 15px 容差范围
-                })
-            } else if (obj.type === 'shape' && obj.startPoint && obj.endPoint) {
-                // 检查点击是否在图形范围内
-                const minX = Math.min(obj.startPoint.x, obj.endPoint.x)
-                const maxX = Math.max(obj.startPoint.x, obj.endPoint.x)
-                const minY = Math.min(obj.startPoint.y, obj.endPoint.y)
-                const maxY = Math.max(obj.startPoint.y, obj.endPoint.y)
-
-                return !(point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY)
-            }
-            return true
-        }))
     }
 
     /* ---------------- 右键取消绘画 ---------------- */
@@ -317,10 +262,10 @@ export default function DrawingCanvas({
 }
 
 /* ======================================================
-   绘制系统
+   绘制系统（与之前相同）
 ====================================================== */
 
-function drawObject(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
+function drawObject(ctx: CanvasRenderingContext2D, obj: any) {
     if (obj.type === 'path' && obj.points) {
         drawPath(ctx, obj)
     } else if (obj.type === 'shape' && obj.startPoint && obj.endPoint) {
@@ -328,99 +273,70 @@ function drawObject(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
     }
 }
 
-function drawPath(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
-    const { tool, points } = obj
-    if (!points || points.length < 2) return
+function drawPath(ctx: CanvasRenderingContext2D, obj: any) {
+    const { tool } = obj
+    if (!obj.points || obj.points.length < 2) return
 
     switch (tool) {
-        case 'pencil':
-            drawPencil(ctx, obj)
-            break
-        case 'pen':
-            drawPen(ctx, obj)
-            break
-        case 'marker':
-            drawMarker(ctx, obj)
-            break
-        case 'brush':
-            drawBrush(ctx, obj)
-            break
+        case 'pencil': drawPencil(ctx, obj); break
+        case 'pen': drawPen(ctx, obj); break
+        case 'marker': drawMarker(ctx, obj); break
+        case 'brush': drawBrush(ctx, obj); break
     }
 }
 
-function drawShape(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
-    const { tool, startPoint, endPoint } = obj
-    if (!startPoint || !endPoint) return
+function drawShape(ctx: CanvasRenderingContext2D, obj: any) {
+    const { tool } = obj
+    if (!obj.startPoint || !obj.endPoint) return
 
     switch (tool) {
         case 'rectangle':
-        case 'rectangle-fill':
-            drawRectangle(ctx, obj)
-            break
+        case 'rectangle-fill': drawRectangle(ctx, obj); break
         case 'circle':
-        case 'circle-fill':
-            drawCircle(ctx, obj)
-            break
+        case 'circle-fill': drawCircle(ctx, obj); break
         case 'triangle':
-        case 'triangle-fill':
-            drawTriangle(ctx, obj)
-            break
-        case 'line':
-            drawLine(ctx, obj)
-            break
-        case 'arrow':
-            drawArrow(ctx, obj)
-            break
+        case 'triangle-fill': drawTriangle(ctx, obj); break
+        case 'line': drawLine(ctx, obj); break
+        case 'arrow': drawArrow(ctx, obj); break
     }
 }
 
-/* ---------------- 画笔工具 ---------------- */
-function drawPencil(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
+// ... 其他绘制函数保持不变（drawPencil, drawPen 等）
+function drawPencil(ctx: CanvasRenderingContext2D, obj: any) {
     ctx.save()
     ctx.strokeStyle = obj.color
     ctx.lineWidth = obj.lineWidth
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
     ctx.beginPath()
-    ctx.moveTo(obj.points![0].x, obj.points![0].y)
-    obj.points!.forEach(p => ctx.lineTo(p.x, p.y))
+    ctx.moveTo(obj.points[0].x, obj.points[0].y)
+    obj.points.forEach((p: any) => ctx.lineTo(p.x, p.y))
     ctx.stroke()
     ctx.restore()
 }
 
-function drawPen(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
+function drawPen(ctx: CanvasRenderingContext2D, obj: any) {
     ctx.save()
     ctx.strokeStyle = obj.color
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
-
-    if (obj.points!.length < 2) {
-        ctx.restore()
-        return
-    }
-
-    // 钢笔效果：根据保存的压力值绘制不同粗细
-    for (let i = 0; i < obj.points!.length - 1; i++) {
-        const p0 = obj.points![i]
-        const p1 = obj.points![i + 1]
-
-        // 使用保存的压力值，如果没有则默认为 1
+    if (obj.points.length < 2) { ctx.restore(); return }
+    for (let i = 0; i < obj.points.length - 1; i++) {
+        const p0 = obj.points[i]
+        const p1 = obj.points[i + 1]
         const pressure0 = p0.pressure ?? 1
         const pressure1 = p1.pressure ?? 1
         const avgPressure = (pressure0 + pressure1) / 2
-
         ctx.lineWidth = obj.lineWidth * avgPressure
-
         ctx.beginPath()
         ctx.moveTo(p0.x, p0.y)
         ctx.lineTo(p1.x, p1.y)
         ctx.stroke()
     }
-
     ctx.restore()
 }
 
-function drawMarker(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
+function drawMarker(ctx: CanvasRenderingContext2D, obj: any) {
     ctx.save()
     ctx.strokeStyle = obj.color
     ctx.lineWidth = obj.lineWidth * 1.6
@@ -428,13 +344,13 @@ function drawMarker(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
     ctx.globalCompositeOperation = 'multiply'
     ctx.lineCap = 'butt'
     ctx.beginPath()
-    ctx.moveTo(obj.points![0].x, obj.points![0].y)
-    obj.points!.forEach(p => ctx.lineTo(p.x, p.y))
+    ctx.moveTo(obj.points[0].x, obj.points[0].y)
+    obj.points.forEach((p: any) => ctx.lineTo(p.x, p.y))
     ctx.stroke()
     ctx.restore()
 }
 
-function drawBrush(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
+function drawBrush(ctx: CanvasRenderingContext2D, obj: any) {
     ctx.save()
     ctx.strokeStyle = obj.color
     ctx.lineCap = 'round'
@@ -443,122 +359,105 @@ function drawBrush(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
         ctx.globalAlpha = 0.15
         ctx.lineWidth = obj.lineWidth + i * 2
         ctx.beginPath()
-        const first = obj.points![0]
+        const first = obj.points[0]
         ctx.moveTo(first.x + (first.ox ?? 0), first.y + (first.oy ?? 0))
-        obj.points!.forEach(p => ctx.lineTo(p.x + (p.ox ?? 0), p.y + (p.oy ?? 0)))
+        obj.points.forEach((p: any) => ctx.lineTo(p.x + (p.ox ?? 0), p.y + (p.oy ?? 0)))
         ctx.stroke()
     }
     ctx.restore()
 }
 
-/* ---------------- 图形工具 ---------------- */
-function drawRectangle(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
-    const { startPoint, endPoint, color, lineWidth, tool } = obj
-    const width = endPoint!.x - startPoint!.x
-    const height = endPoint!.y - startPoint!.y
-
+function drawRectangle(ctx: CanvasRenderingContext2D, obj: any) {
+    const width = obj.endPoint.x - obj.startPoint.x
+    const height = obj.endPoint.y - obj.startPoint.y
     ctx.save()
-    if (tool === 'rectangle-fill') {
-        ctx.fillStyle = color
-        ctx.fillRect(startPoint!.x, startPoint!.y, width, height)
+    if (obj.tool === 'rectangle-fill') {
+        ctx.fillStyle = obj.color
+        ctx.fillRect(obj.startPoint.x, obj.startPoint.y, width, height)
     } else {
-        ctx.strokeStyle = color
-        ctx.lineWidth = lineWidth
-        ctx.strokeRect(startPoint!.x, startPoint!.y, width, height)
+        ctx.strokeStyle = obj.color
+        ctx.lineWidth = obj.lineWidth
+        ctx.strokeRect(obj.startPoint.x, obj.startPoint.y, width, height)
     }
     ctx.restore()
 }
 
-function drawCircle(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
-    const { startPoint, endPoint, color, lineWidth, tool } = obj
-    const centerX = (startPoint!.x + endPoint!.x) / 2
-    const centerY = (startPoint!.y + endPoint!.y) / 2
-    const radiusX = Math.abs(endPoint!.x - startPoint!.x) / 2
-    const radiusY = Math.abs(endPoint!.y - startPoint!.y) / 2
-
+function drawCircle(ctx: CanvasRenderingContext2D, obj: any) {
+    const centerX = (obj.startPoint.x + obj.endPoint.x) / 2
+    const centerY = (obj.startPoint.y + obj.endPoint.y) / 2
+    const radiusX = Math.abs(obj.endPoint.x - obj.startPoint.x) / 2
+    const radiusY = Math.abs(obj.endPoint.y - obj.startPoint.y) / 2
     ctx.save()
     ctx.beginPath()
     ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2)
-
-    if (tool === 'circle-fill') {
-        ctx.fillStyle = color
+    if (obj.tool === 'circle-fill') {
+        ctx.fillStyle = obj.color
         ctx.fill()
     } else {
-        ctx.strokeStyle = color
-        ctx.lineWidth = lineWidth
+        ctx.strokeStyle = obj.color
+        ctx.lineWidth = obj.lineWidth
         ctx.stroke()
     }
     ctx.restore()
 }
 
-function drawTriangle(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
-    const { startPoint, endPoint, color, lineWidth, tool } = obj
-    const topX = (startPoint!.x + endPoint!.x) / 2
-    const topY = startPoint!.y
-
+function drawTriangle(ctx: CanvasRenderingContext2D, obj: any) {
+    const topX = (obj.startPoint.x + obj.endPoint.x) / 2
+    const topY = obj.startPoint.y
     ctx.save()
     ctx.beginPath()
     ctx.moveTo(topX, topY)
-    ctx.lineTo(endPoint!.x, endPoint!.y)
-    ctx.lineTo(startPoint!.x, endPoint!.y)
+    ctx.lineTo(obj.endPoint.x, obj.endPoint.y)
+    ctx.lineTo(obj.startPoint.x, obj.endPoint.y)
     ctx.closePath()
-
-    if (tool === 'triangle-fill') {
-        ctx.fillStyle = color
+    if (obj.tool === 'triangle-fill') {
+        ctx.fillStyle = obj.color
         ctx.fill()
     } else {
-        ctx.strokeStyle = color
-        ctx.lineWidth = lineWidth
+        ctx.strokeStyle = obj.color
+        ctx.lineWidth = obj.lineWidth
         ctx.stroke()
     }
     ctx.restore()
 }
 
-function drawLine(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
-    const { startPoint, endPoint, color, lineWidth } = obj
+function drawLine(ctx: CanvasRenderingContext2D, obj: any) {
     ctx.save()
-    ctx.strokeStyle = color
-    ctx.lineWidth = lineWidth
+    ctx.strokeStyle = obj.color
+    ctx.lineWidth = obj.lineWidth
     ctx.lineCap = 'round'
     ctx.beginPath()
-    ctx.moveTo(startPoint!.x, startPoint!.y)
-    ctx.lineTo(endPoint!.x, endPoint!.y)
+    ctx.moveTo(obj.startPoint.x, obj.startPoint.y)
+    ctx.lineTo(obj.endPoint.x, obj.endPoint.y)
     ctx.stroke()
     ctx.restore()
 }
 
-function drawArrow(ctx: CanvasRenderingContext2D, obj: DrawingObject) {
-    const { startPoint, endPoint, color, lineWidth } = obj
-    const dx = endPoint!.x - startPoint!.x
-    const dy = endPoint!.y - startPoint!.y
+function drawArrow(ctx: CanvasRenderingContext2D, obj: any) {
+    const dx = obj.endPoint.x - obj.startPoint.x
+    const dy = obj.endPoint.y - obj.startPoint.y
     const angle = Math.atan2(dy, dx)
     const arrowLength = 15
-
     ctx.save()
-    ctx.strokeStyle = color
-    ctx.fillStyle = color
-    ctx.lineWidth = lineWidth
+    ctx.strokeStyle = obj.color
+    ctx.fillStyle = obj.color
+    ctx.lineWidth = obj.lineWidth
     ctx.lineCap = 'round'
-
-    // 绘制线条
     ctx.beginPath()
-    ctx.moveTo(startPoint!.x, startPoint!.y)
-    ctx.lineTo(endPoint!.x, endPoint!.y)
+    ctx.moveTo(obj.startPoint.x, obj.startPoint.y)
+    ctx.lineTo(obj.endPoint.x, obj.endPoint.y)
     ctx.stroke()
-
-    // 绘制箭头
     ctx.beginPath()
-    ctx.moveTo(endPoint!.x, endPoint!.y)
+    ctx.moveTo(obj.endPoint.x, obj.endPoint.y)
     ctx.lineTo(
-        endPoint!.x - arrowLength * Math.cos(angle - Math.PI / 6),
-        endPoint!.y - arrowLength * Math.sin(angle - Math.PI / 6)
+        obj.endPoint.x - arrowLength * Math.cos(angle - Math.PI / 6),
+        obj.endPoint.y - arrowLength * Math.sin(angle - Math.PI / 6)
     )
     ctx.lineTo(
-        endPoint!.x - arrowLength * Math.cos(angle + Math.PI / 6),
-        endPoint!.y - arrowLength * Math.sin(angle + Math.PI / 6)
+        obj.endPoint.x - arrowLength * Math.cos(angle + Math.PI / 6),
+        obj.endPoint.y - arrowLength * Math.sin(angle + Math.PI / 6)
     )
     ctx.closePath()
     ctx.fill()
-
     ctx.restore()
 }

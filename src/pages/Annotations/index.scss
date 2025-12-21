@@ -33,7 +33,7 @@
                 border-radius: 4px;
                 flex: 1;
                 background-color: #ffffff;
-                font-size: 12px;
+                font-size: 11px;
                 line-height: 1.5;
                 overflow-y: auto;
                 word-break: break-word;
@@ -93,6 +93,59 @@
             &_Content li {
                 margin: 1px 0 !important;
                 font-size: 12px !important;
+            }
+
+            &_Content pre {
+                flex-wrap: wrap;
+                background: black;
+                border-radius: 0.5rem;
+                color: white;
+                font-family: 'JetBrainsMono', monospace;
+                margin: 2px 0;
+                padding: 0.45rem 0.7rem;
+                white-space: pre-wrap;
+                word-break: break-word;
+                overflow-wrap: break-word;
+
+                overflow-x: hidden;
+
+                code {
+                    display: block;
+                    width: 100%;
+                    max-width: 100%;
+
+                    white-space: inherit;
+                    word-break: inherit;
+                    overflow-wrap: inherit;
+
+                    background: none;
+                    color: inherit;
+                    font-size: 10px;
+                    padding: 0;
+                }
+            }
+
+            &_Content mark {
+                border-radius: 2px;
+                box-decoration-break: clone;
+                padding: 2px 3px;
+            }
+
+            &_Content blockquote {
+                border-left: 3px solid #E7E4E2;
+                margin: 5px 0;
+                padding-left: 5px;
+            }
+
+            &_Content hr {
+                border: none;
+                border-top: 1px solid #F0EEED;
+                margin: 5px 0;
+            }
+
+            &_Content a {
+                color: #1a73e8;
+                text-decoration: underline;
             }
 
             &_text {

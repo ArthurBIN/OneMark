@@ -53,14 +53,14 @@ export default function TextEditor({ value, onChange }: {
 
     const dispatch = useDispatch<AppDispatch>()
 
-    const {
-        tool,
-        color,
-        lineWidth
-    } = useSelector((state: RootState) => state.drawing)
-
     const editorContainerRef = useRef<HTMLDivElement | null>(null);
     const { isDrawingMode, drawingTool, setIsDrawingMode, setDrawingTool } = useDrawing();
+
+    const { objects } = useSelector((state: RootState) => state.drawing);
+
+    useEffect(() => {
+        console.log(objects);
+    }, [objects]);
 
     // 监听右键取消绘图事件
     useEffect(() => {
@@ -111,9 +111,6 @@ export default function TextEditor({ value, onChange }: {
                     <DrawingCanvas
                         isActive={isDrawingMode}
                         targetRef={editorContainerRef}
-                        color={color}
-                        lineWidth={lineWidth}
-                        tool={tool}
                     />
                 )}
             </div>

@@ -3,13 +3,14 @@ import { supabase } from '@/utils/supabaseClient';
 import type {
     Annotation,
     AnnotationPage,
-    TextAnnotation,
-    DrawingAnnotation,
     AnnotationType,
     ContentType,
-    TextAnnotationType,
-    DrawingType
 } from '@/types/annotations';
+
+import type {
+    DrawingAnnotation,
+    DrawingType
+} from '@/types/drawing'
 
 // ==================== Annotations (项目) ====================
 
@@ -220,84 +221,6 @@ export async function deleteAnnotationPage(pageId: string) {
     if (error) throw error;
 }
 
-// ==================== Text Annotations (文本标记) ====================
-
-// 创建文本标记
-export async function createTextAnnotation(params: {
-    page_id: string;
-    start_offset: number;
-    end_offset: number;
-    selected_text: string;
-    annotation_type: TextAnnotationType;
-    color?: string;
-    note?: string;
-}) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('未登录');
-
-    const { data, error } = await supabase
-        .from('text_annotations')
-        .insert({
-            ...params,
-            user_id: user.id,
-            color: params.color || '#FFFF00'
-        })
-        .select()
-        .single();
-
-    if (error) throw error;
-    return data as TextAnnotation;
-}
-
-// 获取页面的所有文本标记
-export async function getTextAnnotations(pageId: string) {
-    const { data, error } = await supabase
-        .from('text_annotations')
-        .select()
-        .eq('page_id', pageId)
-        .order('start_offset', { ascending: true });
-
-    if (error) throw error;
-    return data as TextAnnotation[];
-}
-
-// 更新文本标记
-export async function updateTextAnnotation(
-    annotationId: string,
-    updates: Partial<Pick<TextAnnotation, 'color' | 'note' | 'annotation_type'>>
-) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('未登录');
-
-    const { data, error } = await supabase
-        .from('text_annotations')
-        .update({
-            ...updates,
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', annotationId)
-        .eq('user_id', user.id)
-        .select()
-        .single();
-
-    if (error) throw error;
-    return data as TextAnnotation;
-}
-
-// 删除文本标记
-export async function deleteTextAnnotation(annotationId: string) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('未登录');
-
-    const { error } = await supabase
-        .from('text_annotations')
-        .delete()
-        .eq('id', annotationId)
-        .eq('user_id', user.id);
-
-    if (error) throw error;
-}
-
 // ==================== Drawing Annotations (绘图标记) ====================
 
 // 创建绘图标记
@@ -379,42 +302,6 @@ export async function deleteDrawingAnnotation(annotation_id: string) {
         .eq('user_id', user.id);
 
     if (error) throw error;
-}
-
-// ==================== 组合查询 ====================
-
-// 获取页面的所有标记（文本 + 绘图）
-export async function getAllAnnotationsForPage(page_id: string) {
-    const [textAnnotations, drawingAnnotations] = await Promise.all([
-        getTextAnnotations(page_id),
-        getDrawingAnnotations(page_id)
-    ]);
-
-    return {
-        textAnnotations,
-        drawingAnnotations
-    };
-}
-
-// 获取完整的标注项目数据（包含所有页面和标记）
-export async function getFullAnnotation(annotation_id: string) {
-    const annotation = await getAnnotation(annotation_id);
-    const pages = await getAnnotationPages(annotation_id);
-
-    const pagesWithAnnotations = await Promise.all(
-        pages.map(async (page) => {
-            const annotations = await getAllAnnotationsForPage(page.id);
-            return {
-                ...page,
-                ...annotations
-            };
-        })
-    );
-
-    return {
-        ...annotation,
-        pages: pagesWithAnnotations
-    };
 }
 
 // ==================== 事务 ====================
