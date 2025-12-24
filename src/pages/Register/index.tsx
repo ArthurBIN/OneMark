@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 
 type FieldType = {
+    displayName: string;
     email: string;
     password: string;
     confirmPassword: string;
@@ -30,7 +31,7 @@ export const Register = () => {
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         try {
             setLoading(true)
-            await signUpWithPassword(values.email, values.password);
+            await signUpWithPassword(values.email, values.password, values.displayName);
             navigate('/auth/login', {
                 state: {
                     registerSuccess: true,
@@ -71,6 +72,16 @@ export const Register = () => {
                                 </div>
                             </Button>
                         </p>
+                    </Form.Item>
+
+                    <Form.Item
+                        name="displayName"
+                        rules={[{ required: true, message: '请输入您的名称' }]}
+                    >
+                        <div className='Login_Form_Item'>
+                            <p>名称</p>
+                            <Input placeholder="名称" />
+                        </div>
                     </Form.Item>
 
                     <Form.Item

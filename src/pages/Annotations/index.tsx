@@ -3,7 +3,7 @@ import { GlowCard } from "@/components/GlowCard";
 import { useEffect, useRef, useState } from "react";
 import './index.scss'
 import addImg from '@/assets/img/add.png'
-import { Modal } from "@/components/Modal";
+import { MyModal } from "@/components/MyModal";
 import { MyInput } from "@/components/MyInput";
 import { message, Radio, Switch } from 'antd';
 import type { RadioChangeEvent } from 'antd'
@@ -205,7 +205,7 @@ export const Annotations = () => {
 
 
             {/* 删除项目 */}
-            <Modal
+            <MyModal
                 isOpen={isDelModal}
                 onClose={() => { setIsDelModal(false); setDelAnnotationId('') }}
                 title="删除项目"
@@ -216,10 +216,10 @@ export const Annotations = () => {
                 onButtonClick={handleDelAnnotation}
             >
                 确认删除此项目？
-            </Modal>
+            </MyModal>
 
             {/* 新增项目弹窗 */}
-            <Modal
+            <MyModal
                 isOpen={isAddModal}
                 onClose={() => {
                     setIsAddModal(false);
@@ -270,10 +270,10 @@ export const Annotations = () => {
                     defaultChecked
                     style={{ marginTop: '10px' }}
                 />
-            </Modal>
+            </MyModal>
 
             {/* 新增文本弹窗 */}
-            <Modal
+            <MyModal
                 isOpen={addTextModal}
                 onClose={() => {
                     setTitleText('');
@@ -286,7 +286,7 @@ export const Annotations = () => {
                 onButtonClick={handleCreateTextAnnotation}
             >
                 <SimpleTextEditor value={textContent} onChange={setTextContent} />
-            </Modal>
+            </MyModal>
         </div>
     )
 }

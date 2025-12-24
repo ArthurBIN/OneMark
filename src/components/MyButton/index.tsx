@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { GlowCard } from '@/components/GlowCard';
 import { LoadingOutlined } from '@ant-design/icons';
 import './index.scss';

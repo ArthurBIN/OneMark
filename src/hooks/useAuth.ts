@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/utils/supabaseClient';
+import type { UserProfile } from '@/types/user';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -35,14 +36,32 @@ export function useAuth() {
   };
 
   // 邮箱密码注册
-  const signUpWithPassword = async (email: string, password: string) => {
+  const signUpWithPassword = async (email: string, password: string, displayName: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          display_name: displayName,
+        },
+      },
     });
     if (error) throw error;
     return data;
   };
+
+  // 获取用户资料
+  const getUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (error) throw error
+    return data as UserProfile;
+  }
+
 
   // GitHub OAuth登录
   const signInWithGithub = async () => {
@@ -69,5 +88,6 @@ export function useAuth() {
     signUpWithPassword,
     signInWithGithub,
     signOut,
+    getUserProfile
   };
 }

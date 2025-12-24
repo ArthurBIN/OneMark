@@ -15,7 +15,7 @@ interface ModalProps {
     showButton?: boolean;
 }
 
-export const Modal = ({
+export const MyModal = ({
     isOpen,
     onClose,
     title = '标题',

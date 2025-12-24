@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import './index.scss';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
-import { Breadcrumb } from 'antd';
+import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
+import { Breadcrumb, Popover, Tooltip } from 'antd';
 
 type headerParams = {
     title?: string
@@ -32,14 +32,35 @@ export const AnnotationHeader = ({
                 ]}
             />
             <div className='buttonBox'>
-                <div className='buttonItem'>
-                    <i className='iconfont icon-geren'></i>
-                </div>
+                <Popover placement="bottomRight" content={Collaborators}>
+                    <div className='buttonItem'>
+                        <i className='iconfont icon-geren'></i>
+                    </div>
+                </Popover>
+
                 <div className='buttonItem'>
                     <i className='iconfont icon-fenxiang'></i>
                 </div>
             </div>
 
+        </div>
+    )
+}
+
+const Collaborators = () => {
+
+    return (
+        <div className='Collaborators'>
+            <div className='Collaborators_Title'>
+                协作者
+                <Tooltip placement="top" title="邀请" color="black">
+                    <button
+                        className="Collaborators_Title_Plus"
+                    >
+                        <PlusOutlined />
+                    </button>
+                </Tooltip>
+            </div>
         </div>
     )
 }

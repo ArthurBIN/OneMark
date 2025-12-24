@@ -43,3 +43,30 @@
         }
     }
 }
+
+.Collaborators {
+    width: 200px;
+    font-size: 12px;
+
+    &_Title {
+        position: relative;
+
+        &_Plus {
+            width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            border: none;
+            background-color: #000;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+    }
+}
