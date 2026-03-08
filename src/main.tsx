@@ -13,8 +13,8 @@ createRoot(document.getElementById('root')!).render(
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#000000',
             colorText: '#000000',
+            controlOutline: 'transparent',
           },
           components: {
             Slider: {
@@ -24,6 +24,17 @@ createRoot(document.getElementById('root')!).render(
             Switch: {
               colorPrimaryHover: '#333333',
               colorTextQuaternary: '#d9d9d9',
+            },
+            Input: {
+              hoverBorderColor: '#000000',
+              activeBorderColor: '#000000',
+            },
+            Select: {
+              colorBorder: '#000000',
+              activeBorderColor: '#000000',
+              hoverBorderColor: '#000000',
+              optionSelectedBg: '#000000',     // 选中项背景
+              optionSelectedColor: '#ffffff',  // 选中项文字
             },
           },
         }}

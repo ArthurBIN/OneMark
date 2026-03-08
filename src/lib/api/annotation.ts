@@ -12,6 +12,16 @@ import type {
     DrawingType
 } from '@/types/drawing'
 
+import type { CollaboratorRole } from '@/types/collaborator'
+
+export interface UserSearchResult {
+    id: string
+    email: string
+    display_name: string | null
+    avatar_url: string | null
+    avatar_bg_color: string
+}
+
 // ==================== Annotations (项目) ====================
 
 // 创建空白标注项目
@@ -219,6 +229,113 @@ export async function deleteAnnotationPage(pageId: string) {
         .eq('id', pageId);
 
     if (error) throw error;
+}
+
+// ==================== 协作者 ====================
+
+/**
+ * 搜索用户（通过邮箱或显示名称）
+ */
+export const searchUsers = async (searchTerm: string): Promise<UserSearchResult[]> => {
+    if (!searchTerm || searchTerm.length < 2) {
+        return []
+    }
+
+    const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, email, display_name, avatar_url, avatar_bg_color')
+        .or(`email.ilike.%${searchTerm}%,display_name.ilike.%${searchTerm}%`)
+        .limit(10)
+
+    if (error) {
+        console.error('Error searching users:', error)
+        throw error
+    }
+
+    return data || []
+}
+
+/**
+ * 添加协作者
+ */
+export const addCollaborator = async (
+    annotationId: string,
+    userId: string,
+    role: CollaboratorRole = 'viewer'
+) => {
+    const { data, error } = await supabase
+        .from('collaborators')
+        .insert({
+            annotation_id: annotationId,
+            user_id: userId,
+            role: role
+        })
+        .select()
+        .single()
+
+    if (error) {
+        // 处理重复添加的错误
+        if (error.code === '23505') {
+            throw new Error('该用户已经是协作者')
+        }
+        throw error
+    }
+
+    return data
+}
+
+/**
+ * 获取文档的所有协作者
+ */
+export const getCollaborators = async (annotationId: string) => {
+    const { data, error } = await supabase
+        .from('collaborators')
+        .select(`
+            id,
+            user_id,
+            role,
+            created_at,
+            user_profiles (
+                email,
+                display_name,
+                avatar_url,
+                avatar_bg_color
+            )
+        `)
+        .eq('annotation_id', annotationId)
+
+    if (error) throw error
+    return data || []
+}
+
+/**
+ * 移除协作者
+ */
+export const removeCollaborator = async (collaboratorId: string) => {
+    const { error } = await supabase
+        .from('collaborators')
+        .delete()
+        .eq('id', collaboratorId)
+
+    if (error) throw error
+}
+
+/**
+ * 更新协作者角色
+ */
+export const updateCollaboratorRole = async (
+    collaboratorId: string,
+    role: CollaboratorRole
+) => {
+    const { data, error } = await supabase
+        .from('collaborators')
+        .update({ role })
+        .eq('id', collaboratorId)
+        .select()
+        .single()
+
+    if (error) throw error
+    return data
 }
 
 // ==================== Drawing Annotations (绘图标记) ====================
